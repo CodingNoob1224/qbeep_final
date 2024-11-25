@@ -1,0 +1,15 @@
+<!-- templates/registration/logout.html -->
+{% extends 'base.html' %}  <!-- 繼承基礎模板 -->
+
+{% block title %}登出成功{% endblock %}  <!-- 設定標題 -->
+
+{% block content %}  <!-- 定義內容區塊 -->
+    <h1>登出成功</h1>
+    <p>您已成功登出！</p>
+    <p>將在幾秒鐘後自動重定向到登入頁面。</p>
+    <script>
+        setTimeout(function() {
+            window.location.href = "{% url 'login' %}";  // 重定向到登入頁面
+        }, 3000);  // 3秒後重定向
+    </script>
+{% endblock %}

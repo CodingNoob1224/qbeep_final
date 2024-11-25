@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}會員資訊{% endblock %}
+
+{% block content %}
+    <h1>會員資訊</h1>
+    
+    <p><strong>姓名:</strong> {{ user.username }}</p>
+    
+    <h2>修改密碼</h2>
+    <p>請到<a href="{% url 'password_change' %}">這裡</a>修改密碼。</p>
+    
+    <h2>已報名的活動</h2>
+    <ul>
+        {% for registration in registrations %}
+            <li>
+                <a href="{% url 'event_detail' registration.event.id %}">{{ registration.event.name }} - {{ registration.event.event_time }}</a>
+            </li>
+        {% empty %}
+            <li>您尚未報名任何活動。</li>
+        {% endfor %}
+    </ul>
+    {% if qr_code %}
+    <img src="{{ qr_code }}" alt="QR Code for {{ user.username }}">
+{% else %}
+    <p>No QR Code available</p>
+{% endif %}
+
+{% endblock %}

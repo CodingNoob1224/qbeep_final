@@ -1,0 +1,67 @@
+<!-- events/templates/events/check_in_page.html -->
+{% extends 'base.html' %}
+
+{% block title %}簽到頁面{% endblock %}
+
+{% block content %}
+    <h1>活動簽到</h1>
+    <p>活動名稱: {{ event.name }}</p>
+    <p>活動時間: {{ event.event_time }}</p>
+
+    <div id="reader" style="width: 300px; margin: auto;"></div>
+    <div id="result" style="margin-top: 20px; text-align: center; font-size: 1.2em;"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.4.0/html5-qrcode.min.js"></script>
+    <script>
+        // 檢查瀏覽器是否支持攝像頭功能
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("您的瀏覽器不支持攝像頭功能，請更換瀏覽器或設備。");
+        } else {
+            // 嘗試訪問攝像頭
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    // 成功獲取攝像頭
+                    console.log("攝像頭已啟用");
+                    let html5QrcodeScanner = new Html5QrcodeScanner(
+                        "reader", { fps: 10, qrbox: 250 });
+                    html5QrcodeScanner.render(onScanSuccess);
+                })
+                .catch(function(error) {
+                    // 攝像頭無法使用或被拒絕
+                    console.error("無法訪問攝像頭:", error);
+                    alert("無法啟用攝像頭。請檢查設備或授權設置。");
+                });
+        }
+    
+        // 當掃描成功時的回調函數
+        function onScanSuccess(decodedText) {
+            fetch("{% url 'check_in_user' event.id%}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    qr_code: decodedText,
+                    event_id: "{{ event.id }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById("result");
+                if (data.success) {
+                    resultElement.style.color = "green";
+                    resultElement.textContent = data.message;
+                } else {
+                    resultElement.style.color = "red";
+                    resultElement.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error("錯誤:", error);
+                alert("無法提交簽到數據。");
+            });
+        }
+    </script>
+    
+{% endblock %}

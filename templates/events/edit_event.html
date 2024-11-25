@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>編輯活動</h2>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">更新活動</button>
+    </form>
+
+    <a href="{% url 'event_detail' event.id %}">返回活動詳細資訊</a>
+{% endblock %}

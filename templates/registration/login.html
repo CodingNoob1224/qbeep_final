@@ -1,0 +1,17 @@
+<!-- templates/registration/login.html -->
+{% extends 'base.html' %}  <!-- 繼承基礎模板 -->
+
+{% block title %}登入{% endblock %}  <!-- 設定標題 -->
+
+{% block content %}  <!-- 定義內容區塊 -->
+    <h2>登入</h2>
+    {% if form.errors %}
+        <p style="color: red;">登入失敗，請檢查用戶名和密碼。</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">登入</button>
+    </form>
+    <p>還沒有帳號？<a href="{% url 'register' %}">註冊</a></p>
+{% endblock %}

@@ -1,0 +1,18 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}首頁{% endblock %}
+
+{% block content %}
+    <h1>歡迎來到我們的網站！</h1>
+    <p>這裡是活動管理系統，你可以在這裡查看和參加各種活動。</p>
+
+    {% if user.is_authenticated %}
+        <p>你好，{{ user.username }}！</p>
+        <a href="{% url 'event_list' %}" class="btn btn-primary">查看活動列表</a>
+    {% else %}
+        <p>請先登入或註冊以查看活動。</p>
+        <a href="{% url 'login' %}" class="btn btn-secondary">登入</a>
+        <a href="{% url 'register' %}" class="btn btn-secondary">註冊</a>
+    {% endif %}
+{% endblock %}

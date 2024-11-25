@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}活動列表{% endblock %}
+
+{% block content %}
+    <h1>活動列表</h1>
+    <ul>
+        {% for event in events %}
+            <li>
+                <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a> - {{ event.event_time }}
+                {% if user.is_staff %}
+                    <form action="{% url 'check_in_page' event.id %}" method="get" style="display: inline;">
+                        <button type="submit" class="btn btn-primary btn-sm">簽到</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>目前沒有活動。</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ event.name }}</h1>
+    
+    {% if event.poster %}
+        <img src="{{ event.poster.url }}" alt="{{ event.name }} poster" style="max-width:100%; height:auto;">
+    {% endif %}
+    
+    <p><strong>活動簡介:</strong> {{ event.description }}</p>
+    <p><strong>活動時間:</strong> {{ event.event_time }}</p>
+    <p><strong>活動地點:</strong> {{ event.location }}</p>
+    <p><strong>名額限制:</strong> {{ event.capacity_limit }}</p>
+    <p><strong>報名開始:</strong> {{ event.registration_start }}</p>
+    <p><strong>報名結束:</strong> {{ event.registration_end }}</p>
+
+    {% if user.is_authenticated %}
+        {% if is_registered %}
+            <p>您已報名此活動。</p>
+            <form method="POST" action="{% url 'cancel_registration' event.id %}">
+                {% csrf_token %}
+                <button type="submit">取消報名</button>
+            </form>
+        {% elif event.registration_set.count >= event.capacity_limit %}
+            <p>此活動名額已滿。</p>
+        {% else %}
+            <form method="POST" action="{% url 'register_event' event.id %}">
+                {% csrf_token %}
+                <button type="submit">報名活動</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p>請先<a href="{% url 'login' %}">登入</a>以報名活動。</p>
+    {% endif %}
+
+    <!-- Display Edit Event button only for administrators -->
+    {% if user.is_staff %}
+        <a href="{% url 'edit_event' event.id %}" class="btn btn-primary">編輯活動</a>
+    {% endif %}
+
+    <a href="{% url 'event_list' %}">返回活動列表</a>
+{% endblock %}
