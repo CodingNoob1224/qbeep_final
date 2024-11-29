@@ -23,7 +23,6 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('event_list')
 
-# 注册视图
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -34,7 +33,6 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
-# 用户资料视图
 @login_required
 def profile(request):
     user = request.user

@@ -25,36 +25,46 @@ def event_list(request):
     events = Event.objects.all()
     return render(request, 'events/event_list.html', {'events': events})
 
+
+from django.utils.timezone import now
+
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    is_registered = Registration.objects.filter(user=request.user, event=event).exists()
-    return render(request, 'events/event_detail.html', {'event': event})
+    is_registered = False
+    if request.user.is_authenticated:
+        is_registered = Registration.objects.filter(user=request.user, event=event).exists()
+    return render(request, 'events/event_detail.html', {
+        'event': event,
+        'is_registered': is_registered,
+        'now': now()  
+    })
 
-
-# def event_detail(request, id):
-#     event = get_object_or_404(Event, id=id)
-#     # Check if the user is registered for the event
-#     return render(request, 'events/event_detail.html', {'event': event, 'is_registered': is_registered})
 
 @login_required
-def register_event(request, id):
-    event = get_object_or_404(Event, id=id)
-    # Check if the event has reached its registration limit
+def register_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    # 检查当前时间是否在报名时间范围内
+    if not (event.registration_start <= now() <= event.registration_end):
+        messages.error(request, '目前非報名時間，無法報名此活動。')
+        return redirect('event_detail', event_id=event_id)
+
+    # 检查活动是否已达报名人数上限
     current_registration_count = Registration.objects.filter(event=event).count()
     if current_registration_count >= event.capacity_limit:
         messages.error(request, '此活動名額已滿，無法報名。')
     else:
-        # Check if the user has already registered for this event
+        # 检查用户是否已经报名
         if not Registration.objects.filter(user=request.user, event=event).exists():
             Registration.objects.create(user=request.user, event=event)
             messages.success(request, '您已成功報名活動！')
         else:
             messages.warning(request, '您已經報名過此活動。')
-    return redirect('event_detail', id=id)
+    return redirect('event_detail', event_id=event_id)
 
 @login_required
-def cancel_registration(request, id):
-    event = get_object_or_404(Event, id=id)
+def cancel_registration(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
     # Check if the user is registered for the event
     registration = Registration.objects.filter(user=request.user, event=event).first()
     if registration:
@@ -62,7 +72,8 @@ def cancel_registration(request, id):
         messages.success(request, '您已成功取消報名！')
     else:
         messages.warning(request, '您尚未報名此活動。')
-    return redirect('event_detail', id=id)
+    return redirect('event_detail', event_id=event_id)
+
 
 def create_event(request):
     error_messages = []
