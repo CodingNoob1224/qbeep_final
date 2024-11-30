@@ -20,6 +20,7 @@ class Event(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     event_time = models.DateTimeField()
+    end_time=models.DateTimeField()
     location = models.CharField(max_length=200)
     capacity_limit = models.PositiveIntegerField()
     registration_start = models.DateTimeField()

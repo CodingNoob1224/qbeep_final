@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils.timezone import now
 from .models import Event, Registration
 from member.forms import EventForm
-
+from django.db.models import Q
 
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -19,14 +20,44 @@ def edit_event(request, event_id):
         form = EventForm(instance=event)
     return render(request, 'events/edit_event.html', {'form': form, 'event': event})
 
+from django.utils import timezone
+from .models import Event
+from datetime import datetime
 
 @login_required(login_url='login')
 def event_list(request):
     events = Event.objects.all()
+    return render(request, 'events/event_list.html', {
+        'events': events,
+        'now': now(),  # 傳遞當前時間給模板
+    })
+    # 取得活動類別和時間篩選條件
+    activity_type = request.GET.get('activity_type')
+    start_time = request.GET.get('start_time')
+    end_time = request.GET.get('end_time')
+
+    # 獲取所有活動並進行篩選
+    events = Event.objects.all()
+
+    if activity_type:
+        events = events.filter(activity_type=activity_type)
+
+    # if start_time:
+    #     try:
+    #         start_time = timezone.make_aware(datetime.strptime(start_time, '%Y-%m-%d %H:%M'))
+    #         events = events.filter(event_time__gte=start_time)
+    #     except ValueError:
+    #         pass  # 當 start_time 不是有效的日期格式時不篩選
+
+    # if end_time:
+    #     try:
+    #         end_time = timezone.make_aware(datetime.strptime(end_time, '%Y-%m-%d %H:%M'))
+    #         events = events.filter(event_time__lte=end_time)
+    #     except ValueError:
+    #         pass  # 當 end_time 不是有效的日期格式時不篩選
+
     return render(request, 'events/event_list.html', {'events': events})
 
-
-from django.utils.timezone import now
 
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -44,23 +75,24 @@ def event_detail(request, event_id):
 def register_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
 
-    # 检查当前时间是否在报名时间范围内
+    # Check if registration is open
     if not (event.registration_start <= now() <= event.registration_end):
         messages.error(request, '目前非報名時間，無法報名此活動。')
         return redirect('event_detail', event_id=event_id)
 
-    # 检查活动是否已达报名人数上限
+    # Check if event capacity is full
     current_registration_count = Registration.objects.filter(event=event).count()
     if current_registration_count >= event.capacity_limit:
         messages.error(request, '此活動名額已滿，無法報名。')
     else:
-        # 检查用户是否已经报名
+        # Check if user is already registered
         if not Registration.objects.filter(user=request.user, event=event).exists():
             Registration.objects.create(user=request.user, event=event)
             messages.success(request, '您已成功報名活動！')
         else:
             messages.warning(request, '您已經報名過此活動。')
     return redirect('event_detail', event_id=event_id)
+
 
 @login_required
 def cancel_registration(request, event_id):
@@ -92,19 +124,12 @@ def create_event(request):
     
     return render(request, 'event/create_event.html', {'form': form, 'error_messages': error_messages})
 
-from django.shortcuts import render, get_object_or_404
-from django.contrib.admin.views.decorators import staff_member_required
-from .models import Event
 
 @staff_member_required
 def check_in_page(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     return render(request, 'events/check_in_page.html', {'event': event})
 
-from django.shortcuts import get_object_or_404, redirect
-from django.http import JsonResponse
-from django.contrib.admin.views.decorators import staff_member_required
-from .models import Event, Registration
 
 @staff_member_required
 def check_in_user(request, event_id):
@@ -115,7 +140,8 @@ def check_in_user(request, event_id):
         if registration:
             registration.checked_in = True
             registration.save()
-            return JsonResponse({'status': 'success', 'message': f'{registration.user.username} 簽到成功！'})
+            messages.success(request, f'{registration.user.username} 簽到成功！')
         else:
-            return JsonResponse({'status': 'error', 'message': '無效的 QR 碼或用戶未註冊。'})
-    return redirect('event_list')
+            messages.error(request, '無效的 QR 碼或用戶未註冊。')
+    return redirect('check_in_page', event_id=event.id)
+

@@ -9,6 +9,7 @@
     
     <p><strong>活動簡介:</strong> {{ event.description }}</p>
     <p><strong>活動時間:</strong> {{ event.event_time }}</p>
+    <p><strong>活動結束時間:</strong> {{ event.end_time }}</p>
     <p><strong>活動地點:</strong> {{ event.location }}</p>
     <p><strong>名額限制:</strong> {{ event.capacity_limit }}</p>
     <p><strong>報名開始:</strong> {{ event.registration_start }}</p>
@@ -51,4 +52,6 @@
 
     <a href="{% url 'event_list' %}">返回活動列表</a>
 {% endblock %}
+
+
 

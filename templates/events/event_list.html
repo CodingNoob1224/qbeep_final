@@ -4,14 +4,39 @@
 
 {% block content %}
     <h1>活動列表</h1>
+
+    <!-- 篩選表單 -->
+    <form method="get" action="{% url 'event_list' %}">
+        <label for="activity_type">活動類別：</label>
+        <select name="activity_type" id="activity_type">
+            <option value="">所有活動類別</option>
+            <option value="lecture" {% if request.GET.activity_type == 'lecture' %}selected{% endif %}>講座</option>
+            <option value="seminar" {% if request.GET.activity_type == 'seminar' %}selected{% endif %}>研討會</option>
+        </select>
+
+        <label for="start_time">活動開始時間：</label>
+        <input type="datetime-local" name="start_time" id="start_time" value="{{ request.GET.start_time }}">
+
+        <label for="end_time">活動結束時間：</label>
+        <input type="datetime-local" name="end_time" id="end_time" value="{{ request.GET.end_time }}">
+
+        <button type="submit">篩選</button>
+    </form>
+
     <ul>
         {% for event in events %}
             <li>
                 <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a> - {{ event.event_time }}
-                {% if user.is_staff %}
-                    <form action="{% url 'check_in_page' event.id %}" method="get" style="display: inline;">
-                        <button type="submit" class="btn btn-primary btn-sm">簽到</button>
-                    </form>
+
+                {% if event.end_time <= now %}
+                    <!-- 如果活動已結束，禁用簽到按鈕 -->
+                    <button type="button" class="btn btn-sm btn-sm " style="color: red;"  disabled>活動已結束，無法簽到</button>
+                {% else %}
+                    {% if user.is_staff %}
+                        <form action="{% url 'check_in_page' event.id %}" method="get" style="display: inline;">
+                            <button type="submit" class="btn btn-primary btn-sm">簽到</button>
+                        </form>
+                    {% endif %}
                 {% endif %}
             </li>
         {% empty %}

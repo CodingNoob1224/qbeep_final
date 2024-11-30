@@ -7,12 +7,16 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = [
-            'name', 'description', 'event_time', 'location', 'capacity_limit',
+            'name', 'description', 'event_time', 'end_time', 'location', 'capacity_limit',
             'registration_start', 'registration_end', 'activity_type', 'status', 
             'poster', 'language'
         ]
     
     event_time = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        input_formats=['%Y-%m-%dT%H:%M']
+    )
+    end_time = forms.DateTimeField(
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         input_formats=['%Y-%m-%dT%H:%M']
     )
