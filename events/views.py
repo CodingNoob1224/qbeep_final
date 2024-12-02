@@ -7,7 +7,8 @@ from member.forms import EventForm
 from django.db.models import Q
 
 from django.contrib.admin.views.decorators import staff_member_required
-
+from django.http import JsonResponse
+import json
 @staff_member_required
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -133,15 +134,21 @@ def check_in_page(request, event_id):
 
 @staff_member_required
 def check_in_user(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
-        qr_code_data = request.POST.get('qr_code')
-        registration = Registration.objects.filter(event=event, user__userprofile__qr_code=qr_code_data).first()
+        data = json.loads(request.body)
+        qr_code = data.get('qr_code')
+        event = get_object_or_404(Event, id=event_id)
+
+        registration = Registration.objects.filter(
+            event=event, user__userprofile__qr_data=qr_code
+        ).first()
+
         if registration:
             registration.checked_in = True
             registration.save()
-            messages.success(request, f'{registration.user.username} 簽到成功！')
+            return JsonResponse({'success': True, 'message': f'{registration.user.username} 簽到成功！'})
         else:
-            messages.error(request, '無效的 QR 碼或用戶未註冊。')
-    return redirect('check_in_page', event_id=event.id)
+            return JsonResponse({'success': False, 'message': '無效的 QR 碼或用戶未註冊。'})
+    return JsonResponse({'success': False, 'message': '無效的請求。'})
+
 

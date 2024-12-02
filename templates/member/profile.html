@@ -20,10 +20,18 @@
             <li>您尚未報名任何活動。</li>
         {% endfor %}
     </ul>
-    {% if qr_code %}
-    <img src="{{ qr_code }}" alt="QR Code for {{ user.username }}">
-{% else %}
-    <p>No QR Code available</p>
-{% endif %}
+    <p>掃描此 QR Code 進行簽到</p>
+
+    <div id="qrcode" style="margin: 20px;"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script>
+        // 初始化 QR Code
+        const qr = new QRious({
+            element: document.getElementById('qrcode'),
+            value: "{{ user.userprofile.qr_data }}",  // 從後端加載數據
+            size: 200,
+        });
+    </script>
 
 {% endblock %}
