@@ -130,3 +130,14 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 SITE_URL = 'http://127.0.0.1:8000'
+
+INSTALLED_APPS += [
+    "corsheaders",
+]
+
+MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
+
+CORS_ALLOWED_ORIGINS = [
+    "https://project11301.pythonanywhere.com/events/check-in/10/",  # 修改為你的前端域名
+    "https://你的域名.com",
+]
