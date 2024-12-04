@@ -21,17 +21,11 @@
         {% endfor %}
     </ul>
     <p>掃描此 QR Code 進行簽到</p>
+{% if user.userprofile.qr_code %}
+    <img src="{{ user.userprofile.qr_code.url }}" alt="會員 QR Code">
+{% else %}
+    <p>無法顯示 QR Code，可能尚未生成。</p>
+{% endif %}
 
-    <div id="qrcode" style="margin: 20px;"></div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-    <script>
-        // 初始化 QR Code
-        const qr = new QRious({
-            element: document.getElementById('qrcode'),
-            value: "{{ user.userprofile.qr_data }}",  // 從後端加載數據
-            size: 200,
-        });
-    </script>
 
 {% endblock %}

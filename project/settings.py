@@ -138,6 +138,7 @@ INSTALLED_APPS += [
 MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
 
 CORS_ALLOWED_ORIGINS = [
-    "https://project11301.pythonanywhere.com/events/check-in/10/",  # 修改為你的前端域名
+    "https://project11301.pythonanywhere.com",  # 修改為你的前端域名
     "https://你的域名.com",
 ]
+
