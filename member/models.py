@@ -39,3 +39,15 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    # events/models.py
+    from django.db import models
+    from django.contrib.auth.models import User
+
+    class Event(models.Model):
+        name = models.CharField(max_length=200)
+        event_time = models.DateTimeField()
+        participants = models.ManyToManyField(User, related_name='checked_in_events')
+
+        def __str__(self):
+            return self.name

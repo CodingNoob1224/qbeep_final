@@ -86,3 +86,44 @@ def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'userprofile'):
         instance.userprofile.save()
 
+# member/views.py
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+# 修正模型導入
+from events.models import Event  # 移至正確的應用
+from .models import UserProfile
+
+@csrf_exempt
+def check_in_user(request, event_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            scanned_qr_data = data.get("qr_code")
+            
+            # 查找用戶和活動
+            user_profile = UserProfile.objects.filter(qr_data=scanned_qr_data).first()
+            event = Event.objects.filter(id=event_id).first()
+
+            if not event:
+                return JsonResponse({"success": False, "message": "活動不存在"})
+
+            if not user_profile:
+                return JsonResponse({"success": False, "message": "用戶未註冊"})
+
+            user = user_profile.user
+
+            # 檢查是否已簽到
+            if event.participants.filter(id=user.id).exists():
+                return JsonResponse({"success": False, "message": f"{user.username} 已簽到"})
+
+            # 執行簽到
+            event.participants.add(user)
+            return JsonResponse({"success": True, "message": f"{user.username} 簽到成功"})
+
+        except Exception as e:
+            print("後端錯誤:", e)
+            return JsonResponse({"success": False, "message": "發生錯誤，請稍後再試"})
+
+    return JsonResponse({"success": False, "message": "僅接受 POST 請求"})
