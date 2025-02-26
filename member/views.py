@@ -22,6 +22,21 @@ class CustomLoginView(LoginView):
 
     def get_success_url(self):
         return reverse_lazy('event_list')
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import UserRegistrationForm
+
+# def register(request):
+#     if request.method == "POST":
+#         form = UserRegistrationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)  # 註冊後自動登入
+#             return redirect("event_list")  # 註冊成功後跳轉到活動列表
+#     else:
+#         form = UserRegistrationForm()
+
+#     return render(request, "registration/register.html", {"form": form})
 
 def register(request):
     if request.method == 'POST':
@@ -127,3 +142,18 @@ def check_in_user(request, event_id):
             return JsonResponse({"success": False, "message": "發生錯誤，請稍後再試"})
 
     return JsonResponse({"success": False, "message": "僅接受 POST 請求"})
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import CustomUserCreationForm
+
+def register(request):
+    if request.method == "POST":
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # 註冊後自動登入
+            return redirect("event_list")  # 成功後跳轉到活動列表
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, "registration/register.html", {"form": form})

@@ -6,7 +6,7 @@ from django.core.files.base import ContentFile
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
-    phone = models.CharField(max_length=20, blank=True, null=True, default="N/A")
+    phone = models.CharField(unique = True, max_length=10, blank=True, null=True, default="N/A")
     birthday = models.DateField(blank=True, null=True)
     department = models.CharField(max_length=100, blank=True, null=True, default="未指定")
     registered_time = models.DateTimeField(auto_now_add=True)
@@ -38,7 +38,7 @@ class UserProfile(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.user.username
+        return self.user
 
     # events/models.py
     from django.db import models
@@ -47,7 +47,9 @@ class UserProfile(models.Model):
     class Event(models.Model):
         name = models.CharField(max_length=200)
         event_time = models.DateTimeField()
-        participants = models.ManyToManyField(User, related_name='checked_in_events')
+        participants = models.ManyToManyField(
+            User, related_name='member_checked_in_events'
+        )
+    def __str__(self):
+        return self.user.username  # ✅ 應該返回 username，避免錯誤
 
-        def __str__(self):
-            return self.name

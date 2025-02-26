@@ -50,3 +50,38 @@ class EventForm(forms.ModelForm):
             self.add_error("event_time", "活動時間要在未來")
         
         return cleaned_data
+from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from .models import UserProfile
+
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True, label="電子郵件")
+    phone = forms.CharField(max_length=20, required=True, label="手機號碼")
+    username = forms.CharField(max_length=150, required=True, label="姓名")
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'phone', 'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+            # 創建 UserProfile 並關聯
+            UserProfile.objects.create(user=user, phone=self.cleaned_data['phone'])
+        return user
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True, label="電子郵件")
+    phone = forms.CharField(required=True, label="手機號碼")
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "phone", "password1", "password2"]

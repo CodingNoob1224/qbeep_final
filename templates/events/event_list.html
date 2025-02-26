@@ -32,10 +32,13 @@
                     <!-- 如果活動已結束，禁用簽到按鈕 -->
                     <button type="button" class="btn btn-sm btn-sm " style="color: red;"  disabled>活動已結束，無法簽到</button>
                 {% else %}
-                    {% if user.is_staff %}
-                        <form action="{% url 'check_in_page' event.id %}" method="get" style="display: inline;">
-                            <button type="submit" class="btn btn-primary btn-sm">簽到</button>
-                        </form>
+                {% if user.is_staff %}
+                <form action="{% url 'check_in_page' event.id %}" method="get" style="display: inline;">
+                    <button type="submit" class="btn btn-primary btn-sm">簽到</button>
+                </form>
+                <form action="{% url 'check_out_page' event.id %}" method="get" style="display: inline;">
+                    <button type="submit" class="btn btn-warning btn-sm">簽退</button>
+                </form>
                     {% endif %}
                 {% endif %}
             </li>

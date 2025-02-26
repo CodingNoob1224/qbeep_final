@@ -13,7 +13,7 @@
 
     {% block content %}
     <h1>管理平台</h1>
-    <p>您可以新增和編輯活動，以及查看報名狀態。</p>
+    <p>您可以新增和編輯活動。</p>
 
     <h2>新增活動</h2>
     <form method="post" action="{% url 'create_event' %}">
@@ -27,21 +27,7 @@
         {% for event in events %}
             <li>
                 <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a> - {{ event.event_time }}
-                
-                {% if user.is_superuser %}
-                    <!-- If the user is an admin, show the list of registered users -->
-                    <h4>已報名的使用者:</h4>
-                    <ul>
-                        {% for registration in event.registration_set.all %}
-                            <li>{{ registration.user.username }} - {{ registration.registration_time }}</li>
-                        {% empty %}
-                            <li>目前沒有人報名。</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <!-- For non-admin users, show a registration message or action -->
-                    <p>你可以點擊查看活動詳細資訊並進行報名。</p>
-                {% endif %}
+                <p>你可以點擊查看活動詳細資訊並進行報名。</p>
             </li>
         {% empty %}
             <li>目前沒有活動。</li>

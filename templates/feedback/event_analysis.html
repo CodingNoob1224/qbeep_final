@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}活動分析{% endblock %}
+
+{% block content %}
+<h1>活動分析</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>活動名稱</th>
+            <th>活動時間</th>
+            <th>參加人數</th>
+            <th>回饋數量</th>
+            <th>查看詳情</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in event_data %}
+        <tr>
+            <td>{{ data.event.name }}</td>
+            <td>{{ data.event.event_time }}</td>
+            <td>{{ data.registrations_count }}</td>
+            <td>{{ data.feedback_count }}</td>
+            <td>
+                <a href="{% url 'check_detail' data.event.id %}" class="btn btn-primary">查看</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">尚無活動記錄</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

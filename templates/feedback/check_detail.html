@@ -1,0 +1,50 @@
+<!-- feedback/check_detail.html -->
+<h1>{{ event.name }} - 參加者列表</h1>
+<p>活動時間: {{ event.event_time }}</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>用戶名稱</th>
+            <th>電子郵件</th>
+            <th>簽到狀態</th>
+            <th>簽到時間</th>
+            <th>簽退時間</th>  <!-- 新增簽退時間欄位 -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for check in checks %}
+        <tr>
+            <td>{{ check.user.username }}</td>
+            <td>{{ check.user.email }}</td>
+            <td>
+                {% if check.is_checked_in %}
+                    ✅ 已簽到
+                {% else %}
+                    ❌ 未簽到
+                {% endif %}
+            </td>
+            <td>
+                {% if check.check_in_time %}
+                    {{ check.check_in_time|date:"Y-m-d H:i:s" }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+            <td>
+                {% if check.check_out_time %}
+                    {{ check.check_out_time|date:"Y-m-d H:i:s" }}  <!-- 顯示活動的簽退時間 -->
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">尚無參加者</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'event_analysis' %}" class="btn btn-secondary">返回活動分析</a>

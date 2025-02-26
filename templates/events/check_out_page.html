@@ -1,0 +1,72 @@
+<!-- events/templates/events/check_out_page.html -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+
+{% extends 'base.html' %}
+{% block title %}簽退頁面{% endblock %}
+
+{% block content %}
+<h1>活動簽退</h1>
+<p>活動名稱: {{ event.name }}</p>
+<p>活動時間: {{ event.event_time }}</p>
+
+<div id="reader" style="width: 300px; margin: auto"></div>
+<div id="result" style="margin-top: 20px; text-align: center; font-size: 1.2em; color: red;"></div>
+
+<script>
+  // 檢查瀏覽器是否支持攝像頭
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert("您的瀏覽器不支持攝像頭功能，請更換瀏覽器或設備。");
+  } else {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function (stream) {
+        console.log("攝像頭已啟用");
+
+        let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+          fps: 10,
+          qrbox: 250,
+        });
+
+        html5QrcodeScanner.render(onScanSuccess);
+      })
+      .catch(function (error) {
+        console.error("無法訪問攝像頭:", error);
+        alert("無法啟用攝像頭。請檢查設備或授權設置。");
+      });
+  }
+
+  // 當掃描成功時的回調函數
+  function onScanSuccess(decodedText) {
+    console.log("掃描到的 QR Code:", decodedText);
+
+    fetch("{% url 'check_out_user' event.id %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify({
+        qr_code: decodedText,
+        event_id: "{{ event.id }}",
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log("後端回應:", data);
+
+      if (data.success) {
+        document.getElementById("result").innerHTML = `<span style="color: green;">${data.message}</span>`;
+        setTimeout(() => {
+          window.history.back();
+        }, 2000);
+      } else {
+        document.getElementById("result").innerHTML = `<span style="color: red;">簽退失敗: ${data.message}</span>`;
+      }
+    })
+    .catch(error => {
+      console.error("錯誤:", error);
+      document.getElementById("result").innerHTML = `<span style="color: red;">無法提交簽退數據，請稍後再試。</span>`;
+    });
+  }
+</script>
+
+{% endblock %}
