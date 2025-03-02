@@ -22,7 +22,7 @@
                             {% if user.is_superuser %}
                             <a class="nav-link" href="{% url 'profile' %}">管理平台</a>
                             <a class="nav-link" href="{% url 'event_analysis' %}">活動分析</a>
-
+                            <a class="nav-link" href="{% url 'draw_home' %}">抽獎 </a>
                             {% else %}
                             
                             <a class="nav-link" href="{% url 'profile' %}">會員資訊</a>

@@ -38,3 +38,16 @@ class Check(models.Model):
     def is_checked_out(self):
         registration = Registration.objects.filter(user=self.user, event=self.event).first()
         return registration.is_checked_out if registration else False
+from django.db import models
+from django.contrib.auth import get_user_model
+from events.models import Event  # 確保正確導入
+
+User = get_user_model()
+
+class Winner(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)  # 明確使用 Event 類別
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    draw_time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('event', 'user')

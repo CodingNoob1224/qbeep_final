@@ -1,8 +1,8 @@
 <!-- events/templates/events/check_in_page.html -->
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 
-{% extends 'base.html' %} 
-{% block title %}簽到頁面{% endblock %} 
+{% extends 'base.html' %}
+{% block title %}簽到頁面{% endblock %}
 
 {% block content %}
 <h1>活動簽到</h1>
@@ -27,7 +27,8 @@
           qrbox: 250,
         });
 
-        html5QrcodeScanner.render(onScanSuccess);
+        // 渲染並開始掃描
+        html5QrcodeScanner.render(onScanSuccess, onScanError);
       })
       .catch(function (error) {
         console.error("無法訪問攝像頭:", error);
@@ -71,6 +72,12 @@
       console.error("錯誤:", error);
       document.getElementById("result").innerHTML = `<span style="color: red;">無法提交簽到數據，請稍後再試。</span>`;
     });
+  }
+
+  // 當掃描錯誤時的回調函數
+  function onScanError(errorMessage) {
+    console.warn("掃描錯誤:", errorMessage);
+    document.getElementById("result").innerHTML = `<span style="color: red;">掃描錯誤，請再試一次。</span>`;
   }
 </script>
 

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}抽獎活動{% endblock %}
+
+{% block content %}
+<h1>選擇活動進行抽獎</h1>
+<ul>
+    {% for event in events %}
+        <li>
+            {{ event.name }} 
+            <button onclick="showDrawPopup({{ event.id }}, '{{ event.name }}')">抽獎</button>
+        </li>
+    {% endfor %}
+</ul>
+
+<!-- 抽獎彈出視窗 -->
+<div id="drawPopup" style="display: none; position: fixed; top: 30%; left: 50%; transform: translate(-50%, -30%); background: white; padding: 20px; border: 1px solid black;">
+    <h2 id="popupEventName"></h2>
+    <label>請輸入抽獎人數：</label>
+    <input type="number" id="numWinners" min="1">
+    <button onclick="confirmDraw()">確認抽獎</button>
+    <button onclick="closePopup()">取消</button>
+</div>
+
+<!-- 顯示中獎名單 -->
+<div id="winnerList" style="display: none; margin-top: 20px;">
+    <h2>中獎名單</h2>
+    <ul id="winners"></ul>
+</div>
+
+<script>
+    let selectedEventId = null;
+
+    function showDrawPopup(eventId, eventName) {
+        selectedEventId = eventId;
+        document.getElementById("popupEventName").innerText = "抽獎活動：" + eventName;
+        document.getElementById("drawPopup").style.display = "block";
+    }
+
+    function closePopup() {
+        document.getElementById("drawPopup").style.display = "none";
+    }
+
+    function confirmDraw() {
+        let numWinners = document.getElementById("numWinners").value;
+        if (!numWinners || isNaN(numWinners) || numWinners <= 0) {
+            alert("請輸入有效的數字");
+            return;
+        }
+
+        fetch(`/draw_winners/${selectedEventId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                num_winners: numWinners,
+                event_id: selectedEventId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("錯誤：" + data.error);
+            } else {
+                alert("抽獎完成！");
+
+                // 顯示中獎名單
+                let winnerList = document.getElementById("winners");
+                winnerList.innerHTML = "";
+                data.winners.forEach(user => {
+                    let li = document.createElement("li");
+                    li.innerHTML = `🎉 恭喜 ${user.name} - ${user.email} 🎉`;
+                    winnerList.appendChild(li);
+                });
+
+                document.getElementById("winnerList").style.display = "block";
+            }
+        })
+        .catch(error => console.error("抽獎錯誤：", error));
+
+        closePopup();
+    }
+</script>
+
+{% endblock %}
