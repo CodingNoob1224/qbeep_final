@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-bnpk&8ac@96l5yi@-7(@nsv^iu_*$f+gxrco9_qdhlhk(2y6ns
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['git.heroku.com/qbeep.git']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

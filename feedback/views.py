@@ -52,9 +52,7 @@ from .models import Winner
 from events.models import Event
 from feedback.models import Registration
 from django.contrib.auth.decorators import user_passes_test
-
-# 限制只有管理員才能抽獎
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 import random
 from events.models import Event
@@ -64,39 +62,36 @@ from django.contrib.auth.decorators import user_passes_test
 def is_admin(user):
     return user.is_staff
 
-# 讓管理員選擇活動
 @user_passes_test(is_admin)
 def draw_home(request):
     events = Event.objects.all()
     return render(request, 'draw_home.html', {'events': events})
 
-# 執行抽獎
 @user_passes_test(is_admin)
-def draw_winners(request, event_id):
+def draw_winners(request):
     if request.method == "POST":
-        event = get_object_or_404(Event, id=event_id)
+        event_id = request.POST.get("event_id")
         num_winners = int(request.POST.get("num_winners", 1))
+        
+        event = get_object_or_404(Event, id=event_id)
+        checked_in_users = Registration.objects.filter(
+            event=event,
+            status="registered"
+        ).values_list("user_id", "user__username")
 
-        checked_in_users = Attendance.objects.filter(
-            registration__event=event,
-            check_in_status=True,
-            check_out_status=False
-        ).values_list("registration__user", "registration__user__username", "registration__user__email")
-
-        existing_winners = Winner.objects.filter(event=event).values_list("user", flat=True)
+        existing_winners = Winner.objects.filter(event=event).values_list("user_id", flat=True)
         eligible_users = [user for user in checked_in_users if user[0] not in existing_winners]
 
         if len(eligible_users) < num_winners:
-            return JsonResponse({"error": "可抽獎人數不足"}, status=400)
+            return render(request, 'draw_detail.html', {"winners": [], "error": "可抽獎人數不足"})
 
         selected_winners = random.sample(eligible_users, num_winners)
+        winners_list = []
 
-        # 存入資料庫
-        winner_list = []
         for user in selected_winners:
             Winner.objects.create(event=event, user_id=user[0])
-            winner_list.append({"name": user[1], "email": user[2]})
+            winners_list.append({"name": user[1]})
 
-        return JsonResponse({"message": "抽獎完成", "winners": winner_list})
+        return render(request, 'draw_detail.html', {"winners": winners_list})
 
-    return JsonResponse({"error": "僅支援 POST 請求"}, status=405)
+    return redirect('draw_home')
