@@ -67,6 +67,14 @@ def draw_home(request):
     events = Event.objects.all()
     return render(request, 'draw_home.html', {'events': events})
 
+import random
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import user_passes_test
+from .models import Event, Registration, Winner
+
+def is_admin(user):
+    return user.is_staff  # 確保只有管理員可以抽獎
+
 @user_passes_test(is_admin)
 def draw_winners(request):
     if request.method == "POST":
@@ -74,20 +82,26 @@ def draw_winners(request):
         num_winners = int(request.POST.get("num_winners", 1))
         
         event = get_object_or_404(Event, id=event_id)
+        
+        # 取得所有簽到的使用者
         checked_in_users = Registration.objects.filter(
-            event=event,
-            status="registered"
+            event=event, status="registered"
         ).values_list("user_id", "user__username")
 
+        # 取得所有已經中獎的使用者
         existing_winners = Winner.objects.filter(event=event).values_list("user_id", flat=True)
+
+        # 只從未中獎的人裡面抽
         eligible_users = [user for user in checked_in_users if user[0] not in existing_winners]
 
         if len(eligible_users) < num_winners:
-            return render(request, 'draw_detail.html', {"winners": [], "error": "可抽獎人數不足"})
+            return render(request, 'draw_detail.html', {
+                "winners": [], "error": "可抽獎人數不足"
+            })
 
+        # 隨機選擇中獎者
         selected_winners = random.sample(eligible_users, num_winners)
         winners_list = []
-
         for user in selected_winners:
             Winner.objects.create(event=event, user_id=user[0])
             winners_list.append({"name": user[1]})

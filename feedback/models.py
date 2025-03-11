@@ -45,9 +45,10 @@ from events.models import Event  # 確保正確導入
 User = get_user_model()
 
 class Winner(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)  # 明確使用 Event 類別
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    draw_time = models.DateTimeField(auto_now_add=True)
+    draw_time  = models.DateTimeField(auto_now_add=True)  # 記錄中獎時間
 
     class Meta:
-        unique_together = ('event', 'user')
+        unique_together = None  # 移除 UNIQUE 限制
+
