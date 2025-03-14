@@ -3,6 +3,16 @@
 <p>活動時間: {{ event.event_time }}</p>
 
 <table class="table table-striped">
+    <h2>中獎名單</h2>
+{% if winners %}
+    <ul>
+        {% for winner in winners %}
+            <li>{{ winner.user.username }} ({{ winner.user.email }})</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>尚無中獎者</p>
+{% endif %}
     <thead>
         <tr>
             <th>用戶名稱</th>

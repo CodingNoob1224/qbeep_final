@@ -17,9 +17,13 @@ def check_detail(request, event_id):
             'check_out_time': registration.check_out_time if registration.is_checked_out else None
         })
 
+    # 取得中獎名單
+    winners = Winner.objects.filter(event=event)
+
     return render(request, 'feedback/check_detail.html', {
         'event': event,
         'checks': checks,
+        'winners': winners  # 傳遞中獎者資料
     })
 
 
