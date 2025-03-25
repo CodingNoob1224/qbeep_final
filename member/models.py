@@ -6,7 +6,7 @@ from django.core.files.base import ContentFile
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
-    phone = models.CharField(unique = True, max_length=10, blank=True, null=True, default="N/A")
+    phone = models.CharField(max_length=10, blank=True, null=True, default="N/A")
     birthday = models.DateField(blank=True, null=True)
     department = models.CharField(max_length=100, blank=True, null=True, default="未指定")
     registered_time = models.DateTimeField(auto_now_add=True)

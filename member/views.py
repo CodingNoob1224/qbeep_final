@@ -157,3 +157,49 @@ def register(request):
         form = CustomUserCreationForm()
 
     return render(request, "registration/register.html", {"form": form})
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login
+from django.contrib import messages
+from .forms import PasswordResetByPhoneForm, SetNewPasswordForm
+from .models import UserProfile
+
+User = get_user_model()
+def password_reset_by_phone(request):
+    if request.method == "POST":
+        form = PasswordResetByPhoneForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data["username"]
+            phone = form.cleaned_data["phone"]
+            user_profile = UserProfile.objects.get(user__username=username, phone=phone)
+
+            # 記錄 user id 在 session 中，供下一步設定密碼使用
+            request.session["reset_user_id"] = user_profile.user.id
+            return redirect("set_new_password")
+    else:
+        form = PasswordResetByPhoneForm()
+
+    return render(request, "registration/password_reset_by_phone.html", {"form": form})
+
+
+def set_new_password(request):
+    if "reset_user_id" not in request.session:
+        messages.error(request, "未授權的請求")
+        return redirect("password_reset_by_phone")
+
+    user = User.objects.get(id=request.session["reset_user_id"])
+
+    if request.method == "POST":
+        form = SetNewPasswordForm(request.POST)
+        if form.is_valid():
+            user.set_password(form.cleaned_data["new_password"])
+            user.save()
+
+            # 自動登入並清除 session
+            login(request, user)
+            del request.session["reset_user_id"]
+            messages.success(request, "密碼已成功重設，您已自動登入")
+            return redirect("event_list")  # 你可以換成首頁的路由名稱
+    else:
+        form = SetNewPasswordForm()
+
+    return render(request, "registration/set_new_password.html", {"form": form})

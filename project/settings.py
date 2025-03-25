@@ -141,6 +141,12 @@ MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
 
 CORS_ALLOWED_ORIGINS = [
     "https://project11301.pythonanywhere.com",  # 修改為你的前端域名
-    "https://你的域名.com",
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = 'CodingNoob 1224'
+EMAIL_HOST_PASSWORD = 'Qazplm921224'
+EMAIL_USE_TLS = True
 
