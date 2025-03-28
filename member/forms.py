@@ -94,7 +94,7 @@ from .models import UserProfile
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True, label="電子郵件")
-    phone = forms.CharField(max_length=20, required=True, label="手機號碼")
+    phone = forms.CharField(max_length=10, required=True, label="手機號碼")
     username = forms.CharField(max_length=150, required=True, label="姓名")
 
     class Meta:
