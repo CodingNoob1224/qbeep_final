@@ -103,22 +103,13 @@ class UserRegistrationForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
+        user.email = self.cleaned_data["email"]
         if commit:
             user.save()
-            # 創建 UserProfile 並關聯
-            UserProfile.objects.create(user=user, phone=self.cleaned_data['phone'])
+        
+            # 確保 `UserProfile` 被正確創建，並儲存 phone
+            profile, created = UserProfile.objects.get_or_create(user=user)
+            profile.phone = self.cleaned_data["phone"]  # 儲存 phone 到 UserProfile
+            profile.save()
+
         return user
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True, label="電子郵件")
-    phone = forms.CharField(required=True, label="手機號碼")
-
-    class Meta:
-        model = User
-        fields = ["username", "email", "phone", "password1", "password2"]

@@ -40,12 +40,14 @@ from .forms import UserRegistrationForm
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
+            # 儲存用戶並創建 UserProfile
             form.save()
-            return redirect('login')
+            return redirect('event_list')
     else:
-        form = UserCreationForm()
+        form = UserRegistrationForm()
+
     return render(request, 'registration/register.html', {'form': form})
 
 @login_required
@@ -142,21 +144,31 @@ def check_in_user(request, event_id):
             return JsonResponse({"success": False, "message": "發生錯誤，請稍後再試"})
 
     return JsonResponse({"success": False, "message": "僅接受 POST 請求"})
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from .forms import CustomUserCreationForm
+#from django.shortcuts import render, redirect
+#from django.contrib.auth import login
+#from .forms import UserRegistrationForm
+#def register(request):
+#    if request.method == "POST":
+#        form = UserRegistrationForm(request.POST)
+#        if form.is_valid():
+#            user = form.save()
+#            login(request, user)  # 註冊後自動登入
+#            return redirect("event_list")  # 成功後跳轉到活動列表
+#    else:
+#        form = UserRegistrationForm()
 
 def register(request):
-    if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)  # 註冊後自動登入
-            return redirect("event_list")  # 成功後跳轉到活動列表
+            print("Phone:", form.cleaned_data.get('phone'))  # 打印出 phone 的值，檢查是否正確傳遞
+            form.save()
+            return redirect('login')
     else:
-        form = CustomUserCreationForm()
+        form = UserRegistrationForm()
 
-    return render(request, "registration/register.html", {"form": form})
+    return render(request, 'registration/register.html', {'form': form})
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login
 from django.contrib import messages
