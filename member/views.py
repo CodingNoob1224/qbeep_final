@@ -215,3 +215,19 @@ def set_new_password(request):
         form = SetNewPasswordForm()
 
     return render(request, "registration/set_new_password.html", {"form": form})
+
+from .forms import UserProfileEditForm
+
+@login_required
+def edit_profile(request):
+    profile = request.user.userprofile
+
+    if request.method == 'POST':
+        form = UserProfileEditForm(request.POST, instance=profile, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # 換成你個人頁的路由名稱
+    else:
+        form = UserProfileEditForm(instance=profile, user=request.user)
+
+    return render(request, 'member/edit_profile.html', {'form': form})

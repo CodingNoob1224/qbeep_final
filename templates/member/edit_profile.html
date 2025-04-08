@@ -1,0 +1,16 @@
+
+<!-- member/templates/member/edit_profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>編輯個人資料</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">儲存</button>
+</form>
+
+<a href="{% url 'password_change' %}">更改密碼</a>
+{% endblock %}

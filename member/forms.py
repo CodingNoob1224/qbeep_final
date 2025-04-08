@@ -113,3 +113,35 @@ class UserRegistrationForm(UserCreationForm):
             profile.save()
 
         return user
+# member/forms.py
+from django import forms
+from django.contrib.auth.models import User
+from .models import UserProfile
+
+class UserProfileEditForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, required=True, label='使用者名稱')
+    email = forms.EmailField(required=True, label='信箱')
+
+    class Meta:
+        model = UserProfile
+        fields = ['phone']  # 只編輯 profile 自己的欄位
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user:
+            self.fields['username'].initial = user.username
+            self.fields['email'].initial = user.email
+            self.user = user
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        if hasattr(self, 'user'):
+            self.user.username = self.cleaned_data['username']
+            self.user.email = self.cleaned_data['email']
+            if commit:
+                self.user.save()
+        if commit:
+            profile.save()
+        return profile

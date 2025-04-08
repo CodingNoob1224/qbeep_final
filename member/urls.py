@@ -16,6 +16,6 @@ urlpatterns = [
     path('admin/create_event/', views.create_event, name='create_event'),  # 確保這裡有 create_event 的路由
     path("password_reset_by_phone/", password_reset_by_phone, name="password_reset_by_phone"),
     path("set_new_password/", set_new_password, name="set_new_password"),
-]
+    path('edit/', views.edit_profile, name='edit_profile'),]
 
 
