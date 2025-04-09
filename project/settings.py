@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'events',
     'member',
     'feedback',
+    'bootstrap5',
 ]
 
 MIDDLEWARE = [
