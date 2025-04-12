@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>活動回饋統計：{{ form.event.name }}</h2>
+<p>推薦平均分數（第1題）：{{ avg_score|default:"尚無資料" }}</p>
+
+{% for q in questions %}
+  <hr>
+  <h3>Q{{ forloop.counter }}: {{ q.content }}</h3>
+
+  {% if q.question_type in 'rating single_choice' %}
+    <canvas id="chart_{{ q.id }}" width="400" height="200"></canvas>
+  {% endif %}
+
+  <ul>
+    {% for a in answers.q %}
+      <li>{{ a.content }}</li>
+    {% endfor %}
+  </ul>
+{% endfor %}
+
+<h3>所有使用者的填答紀錄</h3>
+<ul>
+  {% for r in responses %}
+    <li>{{ r.registration.user.username }} - {{ r.submit_time }}</li>
+  {% endfor %}
+</ul>
+
+<!-- 載入 Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const chartData = {{ chart_data|safe }};
+
+  for (const [qid, data] of Object.entries(chartData)) {
+    const ctx = document.getElementById('chart_' + qid).getContext('2d');
+    const labels = Object.keys(data);
+    const values = Object.values(data);
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: '回答人數',
+          data: values,
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        scales: {
+          x: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -113,3 +113,85 @@ def draw_winners(request):
         return render(request, 'draw_detail.html', {"winners": winners_list})
 
     return redirect('draw_home')
+
+
+# feedback/views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Form, Question, Response, Answer
+from events.models import Event
+from feedback.models import Registration
+from django.db.models import Avg
+@login_required
+def feedback_dashboard(request):
+    registrations = Registration.objects.filter(
+        user=request.user,
+        status='registered',
+        check_in_time__isnull=False  # ✅ 有簽到時間
+    )
+    return render(request, 'feedback/dashboard.html', {'registrations': registrations})
+@login_required
+def fill_form(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+    registration = get_object_or_404(
+        Registration,
+        user=request.user,
+        event=event,
+        status='registered',
+        check_in_time__isnull=False  # ✅ 有簽到時間
+    )
+    form = get_object_or_404(Form, event=event)
+    questions = Question.objects.all()
+
+    if Response.objects.filter(form=form, registration=registration).exists():
+        return render(request, 'feedback/already_filled.html', {'event': event})
+
+    if request.method == 'POST':
+        response = Response.objects.create(form=form, registration=registration)
+        for question in questions:
+            answer = request.POST.get(f'q_{question.id}', '')
+            Answer.objects.create(response=response, question=question, content=answer)
+        return render(request, 'feedback/thank_you.html')
+
+    return render(request, 'feedback/fill_form.html', {
+        'event': event,
+        'questions': questions,
+    })
+
+from collections import Counter
+from django.db.models import Avg
+from django.http import JsonResponse
+import json
+
+@user_passes_test(lambda u: u.is_staff)
+def form_analysis(request, event_id):
+    form = get_object_or_404(Form, event_id=event_id)
+    questions = Question.objects.all()
+    responses = Response.objects.filter(form=form)
+    avg_score = Answer.objects.filter(
+        question=questions[0],
+        response__form=form
+    ).aggregate(avg=Avg('content'))['avg']
+
+    answers = {
+        q: Answer.objects.filter(question=q, response__form=form)
+        for q in questions
+    }
+
+    # 統計選項題的次數（Chart.js 用）
+    chart_data = {}
+    for q in questions:
+        if q.question_type in ['rating', 'single_choice']:
+            answer_list = [a.content for a in answers[q]]
+            counter = Counter(answer_list)
+            chart_data[q.id] = dict(counter)
+
+    return render(request, 'feedback/form_analysis.html', {
+        'form': form,
+        'avg_score': avg_score,
+        'questions': questions,
+        'answers': answers,
+        'responses': responses,
+        'chart_data': json.dumps(chart_data),
+    })

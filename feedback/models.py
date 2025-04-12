@@ -52,3 +52,42 @@ class Winner(models.Model):
     class Meta:
         unique_together = None  # 移除 UNIQUE 限制
 
+# feedback/models.py
+
+from django.db import models
+from django.contrib.auth.models import User
+from events.models import Event
+from .models import Registration  # 你之前的報名資料模型
+
+class Question(models.Model):
+    QUESTION_TYPES = [
+        ('rating', '0-10 評分'),
+        ('single_choice', '單選'),
+        ('text', '文字回答'),
+    ]
+    content = models.TextField()
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES)
+    options = models.TextField(blank=True, help_text='選項用逗號分隔，例如：極佳, 相當好, 良好')
+
+    def get_options_list(self):
+        return self.options.split(',') if self.options else []
+
+    def __str__(self):
+        return self.content[:50]
+
+class Form(models.Model):
+    event = models.OneToOneField(Event, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.title
+
+class Response(models.Model):
+    form = models.ForeignKey(Form, on_delete=models.CASCADE)
+    registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
+    submit_time = models.DateTimeField(auto_now_add=True)
+
+class Answer(models.Model):
+    response = models.ForeignKey(Response, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    content = models.TextField()

@@ -11,5 +11,7 @@ urlpatterns = [
     path('event/<int:event_id>/', check_detail, name='check_detail'),
     path('draw/', draw_home, name='draw_home'),
     path('draw_winners/', draw_winners, name='draw_winners'),
+    path('forms/', views.feedback_dashboard, name='dashboard'),
+    path('forms/<int:event_id>/fill/', views.fill_form, name='fill_form'),
+    path('forms/<int:event_id>/analysis/', views.form_analysis, name='form_analysis'),
 ]
-

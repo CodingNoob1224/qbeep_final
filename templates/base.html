@@ -97,9 +97,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'event_list' %}"><i class="bi bi-calendar-event"></i> 活動列表</a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'event_list' %}"><i class="bi bi-calendar-event"></i> 活動列表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">填寫問卷</a>
+                    </li>
+
                         {% if user.is_superuser %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}"><i class="bi bi-speedometer2"></i> 管理平台</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'event_analysis' %}"><i class="bi bi-graph-up"></i> 活動分析</a></li>
