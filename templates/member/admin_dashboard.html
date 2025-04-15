@@ -1,40 +1,25 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理平台</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
-</head>
-<body>
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
 
-    {% block title %}管理平台{% endblock %}
+{% block title %}管理平台{% endblock %}
 
-    {% block content %}
+{% block content %}
+<div class="container mt-4">
     <h1>管理平台</h1>
-    <p>您可以新增和編輯活動。</p>
+    <p class="text-muted">歡迎管理員！請選擇您要執行的功能。</p>
 
-    <h2>新增活動</h2>
-    <form method="post" action="{% url 'create_event' %}">
-        {% csrf_token %}
-        <!-- 在這裡放置活動新增的表單 -->
-        <button type="submit" class="btn btn-primary">新增活動</button>
-    </form>
-
-    <h2>查看活動清單</h2>
-    <ul>
-        {% for event in events %}
-            <li>
-                <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a> - {{ event.event_time }}
-                <p>你可以點擊查看活動詳細資訊並進行報名。</p>
-            </li>
-        {% empty %}
-            <li>目前沒有活動。</li>
-        {% endfor %}
-    </ul>
-    
-    {% endblock %}
-
-</body>
-</html>
+    <div class="list-group mt-4">
+        <a href="{% url 'create_event' %}" class="list-group-item list-group-item-action">
+            ➕ 新增活動
+        </a>
+        <a href="{% url 'event_list' %}" class="list-group-item list-group-item-action">
+            📋 活動列表
+        </a>
+        <a href="{% url 'event_analysis' %}" class="list-group-item list-group-item-action">
+            📈 活動分析
+        </a>
+        <a href="{% url 'draw_home' %}" class="list-group-item list-group-item-action">
+            🎯 抽獎功能
+        </a>
+    </div>
+</div>
+{% endblock %}
