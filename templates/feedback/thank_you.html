@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>感謝您的填寫！</h2>
+  <p>我們已收到您的問卷回覆。</p>
+  <a href="{% url 'event_list' %}" class="btn btn-success mt-3">回活動列表</a>
+</div>
+{% endblock %}

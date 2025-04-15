@@ -60,6 +60,8 @@ from events.models import Event
 from .models import Registration  # 你之前的報名資料模型
 
 class Question(models.Model):
+    form = models.ForeignKey('Form', on_delete=models.CASCADE, related_name='questions')
+
     QUESTION_TYPES = [
         ('rating', '0-10 評分'),
         ('single_choice', '單選'),
@@ -74,7 +76,6 @@ class Question(models.Model):
 
     def __str__(self):
         return self.content[:50]
-
 class Form(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)

@@ -1,35 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>活動回饋統計：{{ form.event.name }}</h2>
-<p>推薦平均分數（第1題）：{{ avg_score|default:"尚無資料" }}</p>
+<h2>活動回饋分析：{{ form.event.name }}</h2>
 
+<p>📈 答題率：{{ response_rate }}%</p>
+{% if avg_score %}
+<p>⭐ 推薦平均分數（第一題）：{{ avg_score|floatformat:2 }}</p>
+{% endif %}
+
+<hr>
 {% for q in questions %}
-  <hr>
-  <h3>Q{{ forloop.counter }}: {{ q.content }}</h3>
+  <div class="mb-5">
+    <h4>Q{{ forloop.counter }}：{{ q.content }}</h4>
 
-  {% if q.question_type in 'rating single_choice' %}
-    <canvas id="chart_{{ q.id }}" width="400" height="200"></canvas>
-  {% endif %}
+    {% if q.question_type in 'rating single_choice' %}
+      <canvas id="chart_{{ q.id }}" width="400" height="200"></canvas>
+    {% endif %}
 
-  <ul>
-    {% for a in answers.q %}
-      <li>{{ a.content }}</li>
-    {% endfor %}
-  </ul>
+    {% if q.question_type == 'text' %}
+      {% with answers.q as answer_list %}
+        <ul>
+          {% for a in answer_list %}
+            <li>{{ a.content }}</li>
+          {% empty %}
+            <li><i>尚無回答</i></li>
+          {% endfor %}
+        </ul>
+      {% endwith %}
+    {% endif %}
+  </div>
 {% endfor %}
 
-<h3>所有使用者的填答紀錄</h3>
+<hr>
+<h4>📋 所有填寫者</h4>
 <ul>
   {% for r in responses %}
     <li>{{ r.registration.user.username }} - {{ r.submit_time }}</li>
   {% endfor %}
 </ul>
 
-<!-- 載入 Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const chartData = {{ chart_data|safe }};
-
   for (const [qid, data] of Object.entries(chartData)) {
     const ctx = document.getElementById('chart_' + qid).getContext('2d');
     const labels = Object.keys(data);
@@ -41,17 +52,15 @@
         datasets: [{
           label: '回答人數',
           data: values,
-          backgroundColor: 'rgba(54, 162, 235, 0.7)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 1
         }]
       },
       options: {
         indexAxis: 'y',
         scales: {
-          x: {
-            beginAtZero: true
-          }
+          x: { beginAtZero: true }
         }
       }
     });

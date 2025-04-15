@@ -1,14 +1,14 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<h2>可填寫問卷的活動</h2>
+<h2>我的報名活動</h2>
 <ul>
   {% for reg in registrations %}
     <li>
       {{ reg.event.name }}
-      <a href="{% url 'fill_form' reg.event.id %}">填寫</a>
+      - <a href="{% url 'fill_form' reg.event.id %}">填寫問卷</a>
     </li>
   {% empty %}
-    <p>目前沒有可以填寫問卷的活動。</p>
+    <li>目前沒有符合資格的活動</li>
   {% endfor %}
 </ul>
 {% endblock %}

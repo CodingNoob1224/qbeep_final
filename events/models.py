@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 
+
 class Event(models.Model):
     ACTIVITY_TYPES = [
         ('lecture', '講座'),
@@ -32,6 +33,7 @@ class Event(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
     poster = models.ImageField(upload_to='posters/', blank=True, null=True)
     language = models.CharField(max_length=100, blank=True, null=True)
+
     def __str__(self):
         return self.name
 
@@ -52,9 +54,18 @@ class Event(models.Model):
             raise ValidationError("The event date must be in the future.")
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # Calls the clean() method to enforce validation
+        # 執行數據清理和驗證
+        self.full_clean()
+
+        # 保存活動
         super().save(*args, **kwargs)
 
+        # 創建 Form，並與這個 Event 關聯
+        if not hasattr(self, 'form'):
+            from feedback.models import Form
+            form, created = Form.objects.get_or_create(event=self)
+            if created:
+                print(f"Form for event '{self.name}' created successfully!")
 
 class Registration(models.Model):
     STATUS_CHOICES = [

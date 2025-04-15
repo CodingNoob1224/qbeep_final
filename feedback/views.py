@@ -1,8 +1,29 @@
 # feedback/views.py
 from django.shortcuts import get_object_or_404, render
 from events.models import Event, Registration
-from feedback.models import Check
+from feedback.models import Check, Winner
+from django.db.models import Count
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse
+import random
+from collections import Counter
+import json
+from django import forms
+from .models import Question, Event  # Import your models
+from django.forms import ModelForm 
+from .forms import FeedbackForm
+from feedback.models import Form
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Count, Avg
+from django.http import JsonResponse
+import random, json
+from collections import Counter
 
+from feedback.models import (
+    Check, Winner, Question, Form, Response, Answer
+)
+from events.models import Event, Registration
 def check_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     registrations = Registration.objects.filter(event=event, status='registered')
@@ -26,12 +47,6 @@ def check_detail(request, event_id):
         'winners': winners  # 傳遞中獎者資料
     })
 
-
-from django.db.models import Count
-from django.shortcuts import render
-from events.models import Event
-from feedback.models import Feedback
-
 def event_analysis(request):
     events = Event.objects.annotate(
         registrations_count=Count('event_registrations')  # 聚合報名人數
@@ -48,21 +63,7 @@ def event_analysis(request):
 
     return render(request, 'feedback/event_analysis.html', {'event_data': event_data})
 
-import random
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import Winner
-from events.models import Event
-from feedback.models import Registration
-from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
-import random
-from events.models import Event
-from feedback.models import Winner, Registration
-from django.contrib.auth.decorators import user_passes_test
-
+# 抽獎管理員頁面
 def is_admin(user):
     return user.is_staff
 
@@ -71,22 +72,14 @@ def draw_home(request):
     events = Event.objects.all()
     return render(request, 'draw_home.html', {'events': events})
 
-import random
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import user_passes_test
-from .models import Event, Registration, Winner
-
-def is_admin(user):
-    return user.is_staff  # 確保只有管理員可以抽獎
-
 @user_passes_test(is_admin)
 def draw_winners(request):
     if request.method == "POST":
         event_id = request.POST.get("event_id")
         num_winners = int(request.POST.get("num_winners", 1))
-        
+
         event = get_object_or_404(Event, id=event_id)
-        
+
         # 取得所有簽到的使用者
         checked_in_users = Registration.objects.filter(
             event=event, status="registered"
@@ -114,15 +107,7 @@ def draw_winners(request):
 
     return redirect('draw_home')
 
-
-# feedback/views.py
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Form, Question, Response, Answer
-from events.models import Event
-from feedback.models import Registration
-from django.db.models import Avg
+# 回饋管理
 @login_required
 def feedback_dashboard(request):
     registrations = Registration.objects.filter(
@@ -131,19 +116,32 @@ def feedback_dashboard(request):
         check_in_time__isnull=False  # ✅ 有簽到時間
     )
     return render(request, 'feedback/dashboard.html', {'registrations': registrations})
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from events.models import Event, Registration
+from feedback.models import Form, Question, Response, Answer
+
 @login_required
 def fill_form(request, event_id):
+    # 取得活動物件
     event = get_object_or_404(Event, pk=event_id)
+
+    # 取得已報名且已簽到的使用者報名資料
     registration = get_object_or_404(
         Registration,
         user=request.user,
         event=event,
         status='registered',
-        check_in_time__isnull=False  # ✅ 有簽到時間
+        check_in_time__isnull=False
     )
-    form = get_object_or_404(Form, event=event)
-    questions = Question.objects.all()
 
+    # 取得該活動的問卷
+    form = get_object_or_404(Form, event=event)
+
+    # ✅ 正確抓法：取得該問卷所有問題（不管有沒有被回答過）
+    questions = form.questions.all()
+
+    # ✅ 防止重複填寫
     if Response.objects.filter(form=form, registration=registration).exists():
         return render(request, 'feedback/already_filled.html', {'event': event})
 
@@ -154,44 +152,53 @@ def fill_form(request, event_id):
             Answer.objects.create(response=response, question=question, content=answer)
         return render(request, 'feedback/thank_you.html')
 
+    # 渲染問卷填寫頁
     return render(request, 'feedback/fill_form.html', {
         'event': event,
         'questions': questions,
     })
-
-from collections import Counter
 from django.db.models import Avg
-from django.http import JsonResponse
+from collections import Counter
 import json
 
 @user_passes_test(lambda u: u.is_staff)
 def form_analysis(request, event_id):
     form = get_object_or_404(Form, event_id=event_id)
-    questions = Question.objects.all()
+    questions = form.questions.all()
     responses = Response.objects.filter(form=form)
-    avg_score = Answer.objects.filter(
-        question=questions[0],
-        response__form=form
-    ).aggregate(avg=Avg('content'))['avg']
 
+    total_registrants = Registration.objects.filter(event=form.event, status='registered').count()
+    total_responses = responses.count()
+    response_rate = round((total_responses / total_registrants) * 100, 2) if total_registrants > 0 else 0
+
+    # 預設取第一題為評分題
+    first_rating_q = questions.filter(question_type='rating').first()
+    avg_score = None
+    if first_rating_q:
+        avg_score = Answer.objects.filter(
+            question=first_rating_q,
+            response__form=form
+        ).aggregate(avg=Avg('content'))['avg']
+
+    # 整理每題答案列表
     answers = {
         q: Answer.objects.filter(question=q, response__form=form)
         for q in questions
     }
 
-    # 統計選項題的次數（Chart.js 用）
+    # 建立 Chart.js 資料格式
     chart_data = {}
     for q in questions:
         if q.question_type in ['rating', 'single_choice']:
-            answer_list = [a.content for a in answers[q]]
-            counter = Counter(answer_list)
+            counter = Counter(a.content for a in answers[q])
             chart_data[q.id] = dict(counter)
 
     return render(request, 'feedback/form_analysis.html', {
         'form': form,
-        'avg_score': avg_score,
         'questions': questions,
-        'answers': answers,
         'responses': responses,
+        'answers': answers,
+        'avg_score': avg_score,
+        'response_rate': response_rate,
         'chart_data': json.dumps(chart_data),
     })
