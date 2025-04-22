@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>匯入報名名單：{{ event.name }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="csv_file" class="form-label">上傳 CSV 檔案（欄位名稱為「帳號」）</label>
+    <input type="file" name="csv_file" accept=".csv" required class="form-control">
+  </div>
+  <button type="submit" class="btn btn-primary">匯入報名</button>
+</form>
+
+<hr>
+<h4>匯入結果</h4>
+<ul>
+  {% for m in messages %}
+    <li>{{ m }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -276,3 +276,92 @@ def check_out_user(request, event_id):
 def check_out_page(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     return render(request, 'events/check_out_page.html', {'event': event})
+
+import csv
+import io
+from django.http import HttpResponse
+from django.utils.encoding import escape_uri_path
+from django.utils.timezone import localtime
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import Event, Registration
+from django.shortcuts import get_object_or_404
+
+@staff_member_required
+def export_registrations_csv(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    registrations = Registration.objects.filter(event=event)
+
+    # 使用 StringIO 暫存文字
+    text_buffer = io.StringIO()
+    writer = csv.writer(text_buffer)
+    
+    # 寫入欄位標題（中文）
+    writer.writerow(['帳號', '姓名', '報名狀態', '報名時間', '簽到', '簽到時間', '簽退', '簽退時間'])
+
+    # 寫入每筆報名資料
+    for reg in registrations:
+        writer.writerow([
+            reg.user.username,
+            reg.user.get_full_name() or reg.user.username,
+            '已報名' if reg.status == 'registered' else '取消報名',
+            "'" + localtime(reg.registration_time).strftime("%Y-%m-%d %H:%M"),
+            '是' if reg.is_checked_in else '否',
+            "'" + localtime(reg.check_in_time).strftime("%Y-%m-%d %H:%M") if reg.check_in_time else '',
+            '是' if reg.is_checked_out else '否',
+            "'" + localtime(reg.check_out_time).strftime("%Y-%m-%d %H:%M") if reg.check_out_time else '',
+        ])
+
+    # 編碼為 UTF-8 with BOM，讓 Excel 正確顯示中文
+    content = '\ufeff' + text_buffer.getvalue()
+    byte_buffer = content.encode('utf-8-sig')
+
+    # 傳回 CSV 檔案
+    filename = f"{event.name}_名單.csv"
+    response = HttpResponse(byte_buffer, content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'{escape_uri_path(filename)}'
+    return response
+import csv
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import default_storage
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
+from .models import Event, Registration
+from django.contrib.auth.models import User
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404, render
+from .models import Event, Registration
+from .utils import parse_usernames_from_csv  # 請確認有 utils.py
+
+@staff_member_required
+def import_registrations_csv(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    messages = []
+
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+        usernames, parse_errors = parse_usernames_from_csv(csv_file)
+
+        for username in usernames:
+            user = User.objects.filter(username=username).first()
+            if not user:
+                messages.append(f'❌ 帳號 {username} 不存在')
+                continue
+
+            if Registration.objects.filter(user=user, event=event).exists():
+                messages.append(f'⚠️ {username} 已報名，略過')
+                continue
+
+            if event.event_registrations.count() >= event.capacity_limit:
+                messages.append(f'⛔ 名額已滿，無法替 {username} 報名')
+                continue
+
+            Registration.objects.create(user=user, event=event)
+            messages.append(f'✅ 成功報名：{username}')
+
+        messages += parse_errors  # 將解析錯誤也顯示出來
+
+    return render(request, 'events/import_registrations.html', {
+        'event': event,
+        'messages': messages
+    })

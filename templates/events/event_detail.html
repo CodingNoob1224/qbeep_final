@@ -43,8 +43,10 @@
     <!-- Display Edit Event button only for administrators -->
     {% if user.is_staff %}
         <a href="{% url 'edit_event' event.id %}" class="btn btn-primary">編輯活動</a>
+        <a href="{% url 'export_registrations_csv' event.id %}" class="btn btn-primary">匯出活動名單 CSV</a>
+        <a href="{% url 'import_registrations_csv' event.id %}" class="btn btn-primary">匯入報名名單(CSV)</a>
     {% endif %}
 
     <a href="{% url 'event_list' %}">返回活動列表</a>
 {% endblock %}
-ㄩㄝ
+

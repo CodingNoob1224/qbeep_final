@@ -61,14 +61,12 @@ def profile(request):
     except UserProfile.DoesNotExist:
         profile = None
 
-    if user.is_superuser:
-        return admin_dashboard(request)
-    else:
-        return render(request, 'member/profile.html', {
-            'user': user,
-            'registrations': registrations,
-            'qr_code': profile.qr_code.url if profile and profile.qr_code else None,
-        })
+  
+    return render(request, 'member/profile.html', {
+        'user': user,
+        'registrations': registrations,
+        'qr_code': profile.qr_code.url if profile and profile.qr_code else None,
+    })
 
 # 管理员仪表板视图
 @login_required

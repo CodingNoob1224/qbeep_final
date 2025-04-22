@@ -13,4 +13,7 @@ urlpatterns = [
     path('feedback/analysis/<int:event_id>/', views.event_analysis, name='event_analysis'),
     path('<int:event_id>/check-out/', views.check_out_page, name='check_out_page'),
     path('<int:event_id>/check-out-user/', views.check_out_user, name='check_out_user'),
+    path('events/<int:event_id>/export/', views.export_registrations_csv, name='export_registrations_csv'),
+    path('events/<int:event_id>/import/', views.import_registrations_csv, name='import_registrations_csv'),
+
 ]
