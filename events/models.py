@@ -33,6 +33,7 @@ class Event(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
     poster = models.ImageField(upload_to='posters/', blank=True, null=True)
     language = models.CharField(max_length=100, blank=True, null=True)
+    managers = models.ManyToManyField(User, related_name='managed_events', blank=True)
 
     def __str__(self):
         return self.name

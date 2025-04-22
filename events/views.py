@@ -96,8 +96,9 @@ def cancel_registration(request, event_id):
         messages.warning(request, '您尚未報名此活動。')
     return redirect('event_detail', event_id=event_id)
 
+from events.decorators import has_event_permission
 
-@staff_member_required
+@has_event_permission
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     if request.method == "POST":
@@ -133,7 +134,7 @@ def check_in_page(request, event_id):
     return render(request, 'events/check_in_page.html', {'event': event})
 
 
-@staff_member_required
+@has_event_permission
 def check_in_user(request, event_id):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -155,22 +156,48 @@ def check_in_user(request, event_id):
 from django.shortcuts import render
 from events.models import Event  # 引用 events 应用中的 Event 模型
 from feedback.models import Feedback  # 引用 feedback 应用中的 Feedback 模型
+from events.models import Event, Registration
+from feedback.models import Response
 
+from django.contrib.auth.decorators import login_required
+from feedback.models import Form
+
+from events.models import Event, Registration
+from feedback.models import Form, Response
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+@login_required
 def event_analysis(request):
-    events = Event.objects.all()  # 获取所有活动
+    user = request.user
+
+    if user.is_staff:
+        events = Event.objects.all()
+    else:
+        events = Event.objects.filter(managers=user)
+
     event_data = []
 
     for event in events:
-        # 获取每个活动的报名用户数和反馈数量
-        registrations_count = event.participants.count()  # 使用反向查询来计算报名数量
-        feedback_count = event.feedbacks.count()  # 假设 Event 和 Feedback 有关联，并且是反向查询
+        registrations_count = Registration.objects.filter(event=event, status='registered').count()
+
+        # ✅ 正確放在 for 迴圈裡面
+        form = Form.objects.filter(event=event).first()
+        if form:
+            responses = Response.objects.filter(form=form)
+            feedback_count = responses.count()
+
         event_data.append({
             'event': event,
             'registrations_count': registrations_count,
             'feedback_count': feedback_count,
         })
-    
-    return render(request, 'feedback/event_analysis.html', {'event_data': event_data})
+
+    return render(request, 'feedback/event_analysis.html', {
+        'event_data': event_data
+    })
+
+
 
 from django.shortcuts import render, get_object_or_404
 from .models import Event
@@ -272,7 +299,7 @@ def check_out_user(request, event_id):
             return JsonResponse({"success": False, "message": str(e)})
 
     return JsonResponse({"success": False, "message": "無效的請求"})
-@staff_member_required
+@has_event_permission
 def check_out_page(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     return render(request, 'events/check_out_page.html', {'event': event})
@@ -286,7 +313,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .models import Event, Registration
 from django.shortcuts import get_object_or_404
 
-@staff_member_required
+@has_event_permission
 def export_registrations_csv(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     registrations = Registration.objects.filter(event=event)
@@ -328,12 +355,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 from .models import Event, Registration
 from django.contrib.auth.models import User
-from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404, render
 from .models import Event, Registration
 from .utils import parse_usernames_from_csv  # 請確認有 utils.py
+from events.decorators import has_event_permission
 
-@staff_member_required
+@has_event_permission
 def import_registrations_csv(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     messages = []

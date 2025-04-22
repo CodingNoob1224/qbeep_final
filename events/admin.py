@@ -8,3 +8,10 @@ class CheckAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'event__name')
 
 admin.site.register(Registration, CheckAdmin)
+from django.contrib import admin
+from .models import Event
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('name', 'event_time', 'status')
+    filter_horizontal = ('managers',)  # 多選管理者

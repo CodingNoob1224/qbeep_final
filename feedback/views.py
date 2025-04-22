@@ -48,21 +48,33 @@ def check_detail(request, event_id):
     })
 
 def event_analysis(request):
-    events = Event.objects.annotate(
-        registrations_count=Count('event_registrations')  # 聚合報名人數
-    )
+    user = request.user
+
+    if user.is_staff:
+        events = Event.objects.all()
+    else:
+        events = Event.objects.filter(managers=user)
+
     event_data = []
 
     for event in events:
-        feedback_count = event.feedback_set.count()  # 獲取回饋數量
+        registrations_count = Registration.objects.filter(event=event, status='registered').count()
+
+        # ✅ 正確放在 for 迴圈裡面
+        form = Form.objects.filter(event=event).first()
+        if form:
+            responses = Response.objects.filter(form=form)
+            feedback_count = responses.count()
+
         event_data.append({
             'event': event,
-            'registrations_count': event.registrations_count,  # 使用已計算的報名人數
+            'registrations_count': registrations_count,
             'feedback_count': feedback_count,
         })
 
-    return render(request, 'feedback/event_analysis.html', {'event_data': event_data})
-
+    return render(request, 'feedback/event_analysis.html', {
+        'event_data': event_data
+    })
 # 抽獎管理員頁面
 def is_admin(user):
     return user.is_staff
