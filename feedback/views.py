@@ -185,6 +185,14 @@ def form_analysis(request, event_id):
         q: Answer.objects.filter(question=q, response__form=form)
         for q in questions
     }
+    # 整理問答題答案（避免 template 裡 index dict）
+    text_answers = []
+    for q in questions:
+        if q.question_type == 'text':
+            text_answers.append({
+                'question': q,
+                'answers': Answer.objects.filter(question=q, response__form=form)
+            })
 
     # 建立 Chart.js 資料格式
     chart_data = {}
@@ -197,8 +205,10 @@ def form_analysis(request, event_id):
         'form': form,
         'questions': questions,
         'responses': responses,
-        'answers': answers,
+        'answers': answers,  # 給圖表用
         'avg_score': avg_score,
         'response_rate': response_rate,
         'chart_data': json.dumps(chart_data),
+        'text_answers': text_answers,  # 新增的
     })
+

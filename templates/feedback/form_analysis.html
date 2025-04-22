@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+  .small-pie-chart {
+    width: 500px !important;
+    height: 500px !important;
+  }
+</style>
+
 <h2>活動回饋分析：{{ form.event.name }}</h2>
 
 <p>📈 答題率：{{ response_rate }}%</p>
@@ -9,24 +16,26 @@
 
 <hr>
 {% for q in questions %}
+  {% if q.question_type in 'rating single_choice' %}
+    <div class="mb-5">
+      <h4>Q{{ forloop.counter }}：{{ q.content }}</h4>
+      <canvas id="chart_{{ q.id }}" class="my-2 small-pie-chart"></canvas>
+    </div>
+  {% endif %}
+{% endfor %}
+
+<hr>
+<h4>📝 問答題回覆</h4>
+{% for item in text_answers %}
   <div class="mb-5">
-    <h4>Q{{ forloop.counter }}：{{ q.content }}</h4>
-
-    {% if q.question_type in 'rating single_choice' %}
-      <canvas id="chart_{{ q.id }}" width="400" height="200"></canvas>
-    {% endif %}
-
-    {% if q.question_type == 'text' %}
-      {% with answers.q as answer_list %}
-        <ul>
-          {% for a in answer_list %}
-            <li>{{ a.content }}</li>
-          {% empty %}
-            <li><i>尚無回答</i></li>
-          {% endfor %}
-        </ul>
-      {% endwith %}
-    {% endif %}
+    <h4>Q：{{ item.question.content }}</h4>
+    <ul>
+      {% for a in item.answers %}
+        <li>{{ a.content }}</li>
+      {% empty %}
+        <li><i>尚無回答</i></li>
+      {% endfor %}
+    </ul>
   </div>
 {% endfor %}
 
@@ -43,27 +52,52 @@
   const chartData = {{ chart_data|safe }};
   for (const [qid, data] of Object.entries(chartData)) {
     const ctx = document.getElementById('chart_' + qid).getContext('2d');
-    const labels = Object.keys(data);
-    const values = Object.values(data);
+    const rawLabels = Object.keys(data);
+    const rawValues = Object.values(data);
+    const total = rawValues.reduce((sum, val) => sum + Number(val), 0);
+    const percentages = rawValues.map(val => ((val / total) * 100).toFixed(1));
+    const labelsWithPercent = rawLabels;  // <--- 改這裡！
+
     new Chart(ctx, {
-      type: 'bar',
+      type: 'pie',
       data: {
-        labels: labels,
+        labels: labelsWithPercent,
         datasets: [{
-          label: '回答人數',
-          data: values,
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
-          borderColor: 'rgba(75, 192, 192, 1)',
+          label: '回答比例',
+          data: rawValues,
+          backgroundColor: rawLabels.map((_, i) =>
+            `hsl(${(i * 360 / rawLabels.length)}, 70%, 60%)`
+          ),
+          borderColor: 'white',
           borderWidth: 1
         }]
       },
       options: {
-        indexAxis: 'y',
-        scales: {
-          x: { beginAtZero: true }
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12,
+              padding: 10
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const total = context.chart._metasets[0].total;
+                const value = context.raw;
+                const percent = ((value / total) * 100).toFixed(1);
+                return `回答比例: ${percent}%`;
+              }
+            }
+          }
         }
       }
     });
   }
 </script>
+
+
+
 {% endblock %}
