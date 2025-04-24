@@ -41,7 +41,8 @@
     {% endif %}
 
     <!-- Display Edit Event button only for administrators -->
-    {% if user in event.managers.all %}
+    {% if user in event.managers.all or user.is_staff %}
+    {% comment %} {% if user.is_staff %} {% endcomment %}
         <a href="{% url 'edit_event' event.id %}" class="btn btn-primary">編輯活動</a>
         <a href="{% url 'export_registrations_csv' event.id %}" class="btn btn-primary">匯出活動名單 CSV</a>
         <a href="{% url 'import_registrations_csv' event.id %}" class="btn btn-primary">匯入報名名單(CSV)</a>
