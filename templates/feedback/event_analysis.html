@@ -3,7 +3,7 @@
 {% block title %}活動分析{% endblock %}
 
 {% block content %}
-<h1>活動分析</h1>
+<!-- <h1>活動分析</h1>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -31,5 +31,98 @@
         </tr>
         {% endfor %}
     </tbody>
-</table>
+</table> -->
+
+
+
+
+
+
+<!-- ✅ 新增樣式：加大容器與字體 -->
+<style>
+    .analysis-container {
+        max-width: 1200px; /* ✅ 放大容器寬度 */
+        margin: 60px auto;
+        padding: 50px;
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        font-size: 1.1rem; /* ✅ 全域字體略微放大 */
+    }
+
+    .analysis-container h1 {
+        text-align: center;
+        font-size: 2.3rem; /* ✅ 標題放大 */
+        font-weight: bold;
+        margin-bottom: 40px;
+        color: #0d6efd;
+    }
+
+    .table thead th {
+        text-align: center;
+        background-color: #f1f3f5;
+        color: #495057;
+        font-weight: 600;
+        font-size: 1.1rem; /* ✅ 標題列字體放大 */
+    }
+
+    .table tbody td {
+        text-align: center;
+        vertical-align: middle;
+        font-size: 1.05rem; /* ✅ 表格內容字體略大 */
+    }
+
+    .table tbody tr:hover {
+        background-color: #f0f8ff;
+    }
+
+    .btn-primary {
+        font-size: 1rem; /* ✅ 查看按鈕字體放大 */
+        padding: 8px 16px;
+        border-radius: 6px;
+    }
+
+    .text-center {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+</style>
+
+<!-- ✅ 使用加大容器包裹內容 -->
+<div class="analysis-container">
+    <h1>活動分析</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>活動名稱</th>
+                <th>活動時間</th>
+                <th>參加人數</th>
+                <th>回饋數量</th>
+                <th>查看詳情</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in event_data %}
+            <tr>
+                <td>{{ data.event.name }}</td>
+                <td>{{ data.event.event_time }}</td>
+                <td>{{ data.registrations_count }}</td>
+                <td>{{ data.feedback_count }}</td>
+                <td>
+                    <a href="{% url 'check_detail' data.event.id %}" class="btn btn-primary">查看</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">尚無活動記錄</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+
 {% endblock %}

@@ -3,7 +3,7 @@
 {% block title %}抽獎結果{% endblock %}
 
 {% block content %}
-<h1>抽獎結果</h1>
+<!-- <h1>抽獎結果</h1>
 
 {% if winners %}
     <h2>🎉 中獎者 🎉</h2>
@@ -16,5 +16,95 @@
     <p>沒有可抽獎的參與者，或所有人都已中獎過。</p>
 {% endif %}
 
-<a href="{% url 'draw_home' %}"><button>返回抽獎頁面</button></a>
+<a href="{% url 'draw_home' %}"><button>返回抽獎頁面</button></a> -->
+
+
+
+
+
+<!-- ✅ 新增：樣式區塊，提升視覺體驗 -->
+<style>
+    .draw-result-container {
+        max-width: 700px;
+        margin: 60px auto;
+        padding: 40px;
+        background-color: rgba(255, 255, 255, 0.95); /* 半透明白底容器 */
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        text-align: center; /* ✅ 所有內容置中 */
+    }
+
+    .draw-result-container h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #0d6efd;
+        margin-bottom: 30px;
+    }
+
+    .draw-result-container h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: #28a745; /* ✅ 綠色強調中獎 */
+    }
+
+    .winner-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 auto 30px auto;
+    }
+
+    .winner-list li {
+        background-color: #f1f8ff;
+        padding: 12px 20px;
+        margin: 10px auto;
+        width: 80%;
+        font-size: 1.2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .draw-result-container p {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-top: 20px;
+    }
+
+    .btn-return {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 1rem;
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-return:hover {
+        background-color: #5a6268;
+    }
+</style>
+
+<!-- ✅ 加入美化容器 -->
+<div class="draw-result-container">
+    <h1>抽獎結果</h1>
+
+    {% if winners %}
+        <h2>🎉 中獎者 🎉</h2>
+        <ul class="winner-list"> <!-- ✅ 套用美化後樣式 -->
+            {% for winner in winners %}
+                <li>🎊 {{ winner.name }} 🎊</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>沒有可抽獎的參與者，或所有人都已中獎過。</p>
+    {% endif %}
+
+    <!-- ✅ 美化後的返回按鈕 -->
+    <a href="{% url 'draw_home' %}" class="btn-return">返回抽獎頁面</a>
+</div>
+
+
+
 {% endblock %}

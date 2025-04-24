@@ -3,7 +3,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>編輯個人資料</h2>
+<!-- <h2>編輯個人資料</h2>
 
 <form method="post">
     {% csrf_token %}
@@ -12,5 +12,51 @@
     <button type="submit">儲存</button>
 </form>
 
-<a href="{% url 'password_change' %}">更改密碼</a>
+<a href="{% url 'password_change' %}">更改密碼</a> -->
+
+
+
+
+<!-- 修改：標題置中 + 加大字體 -->
+<h2 style="font-size: 2em; font-weight: bold; margin-bottom: 20px; color: #333; text-align: center;">
+    編輯個人資料
+</h2>
+
+<!-- 修改：表單區塊優化（圓角、陰影、內距） -->
+<form method="post" 
+      style="max-width: 500px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+    {% csrf_token %}
+
+    <!-- 修改：表單欄位優化，手動處理欄位對齊樣式 -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {{ form.as_p }} <!-- 保持原有格式，若要更細緻自訂欄位可拆開處理 -->
+    </div>
+
+    <!-- 修改：按鈕顏色 + 圓角 + 滑鼠懸停效果 -->
+    <button type="submit" 
+            style="width: 100%; padding: 12px 0; background-color: #007BFF; color: white; border: none; border-radius: 8px; font-size: 1em; cursor: pointer; transition: background-color 0.3s;">
+        儲存
+    </button>
+</form>
+
+<!-- 修改：更改密碼連結樣式 -->
+<div style="text-align: center; margin-top: 20px;">
+    <a href="{% url 'password_change' %}" 
+       style="color: #007BFF; text-decoration: none; font-size: 1.1em; transition: color 0.3s;">
+       更改密碼
+    </a>
+</div>
+
+<!-- 新增：按鈕和連結的滑鼠懸停效果 -->
+<style>
+    button:hover {
+        background-color: #0056b3; /* 按鈕顏色變深 */
+    }
+
+    a:hover {
+        color: #0056b3; /* 連結顏色變深 */
+    }
+</style>
+
+
 {% endblock %}

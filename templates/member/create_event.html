@@ -3,10 +3,10 @@
 {% block title %}新增活動{% endblock %}
 
 {% block content %}
-<h1>新增活動</h1>
+<!-- <h1>新增活動</h1>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}  <!-- 自動使用自定義的日期時間選擇器 -->
+    {{ form.as_p }}  <!- - 自動使用自定義的日期時間選擇器 - ->
     <button type="submit" class="btn btn-primary">提交</button>
 </form>
 
@@ -18,6 +18,71 @@
         let errors = "{{ error_messages|join:'\\n' }}";
         alert(errors);  // Display the error messages in an alert box
     </script>
+ {% endif %}-- -->
+
+
+
+
+<!---->
+<!-- 新增：表單容器樣式 -->
+<style>
+    .form-container {
+        background-color: rgba(255, 255, 255, 0.9); /* 半透明白底 */
+        padding: 40px;
+        margin: 40px auto;
+        border-radius: 15px;
+        max-width: 700px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h1 {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .form-container button {
+        display: block;
+        margin: 30px auto 0 auto;
+        padding: 10px 30px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
+
+    /* 美化預設表單欄位 */
+    .form-container input,
+    .form-container select,
+    .form-container textarea {
+        margin-bottom: 15px;
+        padding: 10px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+</style>
+
+<!-- 修改：加入樣式容器 -->
+<div class="form-container">
+    <h1>新增活動</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- 自動使用自定義的日期時間選擇器 -->
+        <button type="submit" class="btn btn-primary">提交</button>
+    </form>
+</div>
+
+{% if error_messages %}
+    <script>
+        // Collect all error messages and join them with new lines
+        let errors = "{{ error_messages|join:'\\n' }}";
+        alert(errors);  // Display the error messages in an alert box
+    </script>
 {% endif %}
+
+
+
+
 
 {% endblock %}

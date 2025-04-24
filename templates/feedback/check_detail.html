@@ -1,5 +1,5 @@
 <!-- feedback/check_detail.html -->
-<h1>{{ event.name }} - 參加者列表</h1>
+<!-- <h1>{{ event.name }} - 參加者列表</h1>
 <p>活動時間: {{ event.event_time }}</p>
 
 {% if user.is_staff %}
@@ -27,7 +27,7 @@
             <th>電子郵件</th>
             <th>簽到狀態</th>
             <th>簽到時間</th>
-            <th>簽退時間</th>  <!-- 新增簽退時間欄位 -->
+            <th>簽退時間</th>  <!- - 新增簽退時間欄位 - ->
         </tr>
     </thead>
     <tbody>
@@ -51,8 +51,8 @@
             </td>
             <td>
                 {% if check.check_out_time %}
-                    {{ check.check_out_time|date:"Y-m-d H:i:s" }}  <!-- 顯示活動的簽退時間 -->
-                {% else %}
+                    {{ check.check_out_time|date:"Y-m-d H:i:s" }}  <!- - 顯示活動的簽退時間 -- >
+                    {% else %}
                     --
                 {% endif %}
             </td>
@@ -65,4 +65,172 @@
     </tbody>
 </table>
 
-<a href="{% url 'event_analysis' %}" class="btn btn-secondary">返回活動分析</a>
+<a href="{% url 'event_analysis' %}" class="btn btn-secondary">返回活動分析</a>  -->
+
+
+
+
+
+
+
+<!-- ✅ 新增：進階美化樣式 -->
+<style>
+    .event-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .event-header h1 {
+        font-weight: bold;
+        font-size: 2rem;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-top: 50px;
+        margin-bottom: 20px;
+        color: #0d6efd;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: "";
+        width: 60px;
+        height: 4px;
+        background-color: #0d6efd;
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 2px;
+    }
+
+    .pretty-table {
+        width: 90%;
+        margin: 0 auto 40px auto; /* ✅ 完整置中 */
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .pretty-table thead {
+        background-color: #f8f9fa;
+    }
+
+    .pretty-table th, .pretty-table td {
+        padding: 16px;
+        text-align: center;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .pretty-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .pretty-table tr:hover {
+        background-color: #f1f8ff;
+    }
+
+    .btn-center {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 50px;
+    }
+</style>
+
+<!-- 活動資訊區塊 -->
+<div class="event-header">
+    <h1>{{ event.name }} - 參加者列表</h1>
+    <p>活動時間: {{ event.event_time }}</p>
+
+    {% if user.is_staff %}
+    <a href="{% url 'form_analysis' event.id %}" class="btn btn-outline-primary">
+        查看問卷統計分析
+    </a>
+    {% endif %}
+</div>
+
+<!-- ✅ 中獎名單 -->
+<h2 class="section-title">中獎名單</h2>
+
+<table class="pretty-table">
+    <thead>
+        <tr>
+            <th>用戶名稱</th>
+            <th>電子郵件</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if winners %}
+            {% for winner in winners %}
+            <tr>
+                <td>{{ winner.user.username }}</td>
+                <td>{{ winner.user.email }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2">尚無中獎者</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<!-- ✅ 簽到名單 -->
+<h2 class="section-title">簽到名單</h2>
+
+<table class="pretty-table">
+    <thead>
+        <tr>
+            <th>用戶名稱</th>
+            <th>電子郵件</th>
+            <th>簽到狀態</th>
+            <th>簽到時間</th>
+            <th>簽退時間</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for check in checks %}
+        <tr>
+            <td>{{ check.user.username }}</td>
+            <td>{{ check.user.email }}</td>
+            <td>
+                {% if check.is_checked_in %}
+                    ✅ 已簽到
+                {% else %}
+                    ❌ 未簽到
+                {% endif %}
+            </td>
+            <td>
+                {% if check.check_in_time %}
+                    {{ check.check_in_time|date:"Y-m-d H:i:s" }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+            <td>
+                {% if check.check_out_time %}
+                    {{ check.check_out_time|date:"Y-m-d H:i:s" }}
+                {% else %}
+                    --
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">尚無參加者</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- ✅ 完整置中的返回按鈕 -->
+<div class="btn-center">
+    <a href="{% url 'event_analysis' %}" class="btn btn-secondary">
+        返回活動分析
+    </a>
+</div>

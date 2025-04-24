@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>我的報名活動</h2>
+<!-- <h2>我的報名活動</h2>
 <ul>
   {% for reg in registrations %}
     <li>
@@ -10,5 +10,79 @@
   {% empty %}
     <li>目前沒有符合資格的活動</li>
   {% endfor %}
-</ul>
+</ul> -->
+
+
+
+
+<!-- 新增：美化區塊樣式 -->
+<style>
+  .activity-section {
+    background-color: rgba(255, 255, 255, 0.85); /* 半透明白底，背景固定仍可見 */
+    padding: 30px;
+    margin: 40px auto;
+    border-radius: 20px;
+    max-width: 700px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .activity-section h2 {
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 25px;
+  }
+
+  .activity-section ul {
+    list-style: none; /* 移除原本的圓點 */
+    padding: 0;
+  }
+
+  .activity-section li {
+    background-color: #f9f9f9;
+    margin: 10px 0;
+    padding: 15px 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+  }
+
+  .activity-section li:hover {
+    background-color: #eef5ff;
+  }
+
+  .activity-section a {
+    text-decoration: none;
+    color: #0d6efd;
+    font-weight: 500;
+  }
+
+  .activity-section a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<!-- 修改：將區塊加上 class 美化 -->
+<div class="activity-section">
+  <h2>我的報名活動</h2>
+  <ul>
+    {% for reg in registrations %}
+      <li>
+        {{ reg.event.name }}
+        <!-- 修改：更現代的問卷連結樣式 -->
+        <a href="{% url 'fill_form' reg.event.id %}">
+          填寫問卷 <i class="bi bi-pencil-square"></i> <!-- Bootstrap Icon -->
+        </a>
+      </li>
+    {% empty %}
+      <li>目前沒有符合資格的活動</li>
+    {% endfor %}
+  </ul>
+</div>
+
+
+
+
 {% endblock %}
