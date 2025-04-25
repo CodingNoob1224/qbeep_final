@@ -3,51 +3,21 @@
 {% block title %}會員資訊{% endblock %}
 
 {% block content %}
-   <!-- <h1>會員資訊</h1>
-    
-    <p><strong>姓名:</strong> {{ user.username }}</p>
-    
-    <h2>修改密碼</h2>
-    <p>請到<a href="{% url 'password_change' %}">這裡</a>修改密碼。</p>
-    <h2>編輯個人資訊</h2>
-    <p>請到<a href="{% url 'edit_profile' %}">這裡</a>編輯資訊。</p>
-    <h2>已報名的活動</h2>
-    <ul>
-        {% for registration in registrations %}
-            <li>
-                <a href="{% url 'event_detail' registration.event.id %}">{{ registration.event.name }} - {{ registration.event.event_time }}</a>
-            </li>
-        {% empty %}
-            <li>您尚未報名任何活動。</li>
-        {% endfor %}
-    </ul>
-    <p>掃描此 QR Code 進行簽到</p>
-{% if user.userprofile.qr_code %}
-    <img src="{{ user.userprofile.qr_code.url }}" alt="會員 QR Code">
-{% else %}
-    <p>無法顯示 QR Code，可能尚未生成。</p>
-{% endif %} -->
-
-
-
-
-
-<!-- ✅ 新增：外部容器控制最大寬度與置中 -->
 <div class="container py-4" style="max-width: 700px; margin: auto;">
 
-    <!-- ✅ QR Code 區塊：移至最上方，置中顯示 -->
+    <!-- ✅ QR Code 區塊 -->
     <div class="text-center mb-4">
         <p class="fw-bold">掃描此 QR Code 進行簽到</p>
-        <p class="text-muted">Debug：{{ user.userprofile.qr_code.url }}</p>
-        {% if user.userprofile.qr_code %}
-            <!-- ✅ QR Code 圖片最大寬度限制 -->
-            <img src="{{ user.userprofile.qr_code.url }}" alt="會員 QR Code" class="img-fluid" style="max-width: 400px;">
+
+        {% if qr_code_base64 %}
+            <!-- ✅ Base64 顯示 QR Code 圖片 -->
+            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="會員 QR Code" class="img-fluid" style="max-width: 400px;">
         {% else %}
             <p class="text-danger">無法顯示 QR Code，可能尚未生成。</p>
         {% endif %}
     </div>
 
-    <!-- ✅ 會員姓名  -->
+    <!-- ✅ 會員姓名 -->
     <div class="card mb-4">
         <div class="card-body">
             <h1 class="h5 mb-0"><strong>姓名：</strong> {{ user.username }}</h1>
@@ -80,15 +50,10 @@
             ⚙️設定
         </div>
         <div class="card-body">
-            <p class="mb-0"> <a href="{% url 'edit_profile' %}">編輯個人資料</a> </p>
+            <p class="mb-0"><a href="{% url 'edit_profile' %}">編輯個人資料</a></p>
             <p class="mb-0"><a href="{% url 'password_change' %}">修改密碼</a></p>
         </div>
     </div>
 
 </div>
-
-
-
-
-
 {% endblock %}

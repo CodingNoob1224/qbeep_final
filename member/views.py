@@ -63,23 +63,33 @@ def register(request):
         form = UserRegistrationForm()
 
     return render(request, 'registration/register.html', {'form': form})
+import base64
 
 @login_required
 def profile(request):
     user = request.user
     registrations = Registration.objects.filter(user=user).select_related('event')
 
-    # 确保 UserProfile 存在
+    # 確保 UserProfile 存在
     try:
         profile = user.userprofile
     except UserProfile.DoesNotExist:
         profile = None
 
-  
+    qr_code_base64 = None
+
+    if profile and profile.qr_code:
+        try:
+            with profile.qr_code.open('rb') as f:
+                qr_code_data = f.read()
+                qr_code_base64 = base64.b64encode(qr_code_data).decode('utf-8')
+        except Exception as e:
+            print("讀 QR code 失敗：", e)
+
     return render(request, 'member/profile.html', {
         'user': user,
         'registrations': registrations,
-        'qr_code': profile.qr_code.url if profile and profile.qr_code else None,
+        'qr_code_base64': qr_code_base64,  # ✅ 傳 base64 給前端
     })
 
 # 管理员仪表板视图
