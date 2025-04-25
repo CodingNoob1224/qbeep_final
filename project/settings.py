@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-bnpk&8ac@96l5yi@-7(@nsv^iu_*$f+gxrco9_qdhlhk(2y6ns'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['qbeepprojectv1test.zeabur.app']
 
 
 # Application definition
@@ -53,6 +53,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://qbeepprojectv1test.zeabur.app",
+    "http://qbeepprojectv1test.zeabur.app",
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -150,3 +154,5 @@ EMAIL_HOST_USER = 'CodingNoob 1224'
 EMAIL_HOST_PASSWORD = 'Qazplm921224'
 EMAIL_USE_TLS = True
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
