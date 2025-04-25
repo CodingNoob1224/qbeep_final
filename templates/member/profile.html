@@ -38,6 +38,7 @@
     <!-- ✅ QR Code 區塊：移至最上方，置中顯示 -->
     <div class="text-center mb-4">
         <p class="fw-bold">掃描此 QR Code 進行簽到</p>
+        <p class="text-muted">Debug：{{ user.userprofile.qr_code.url }}</p>
         {% if user.userprofile.qr_code %}
             <!-- ✅ QR Code 圖片最大寬度限制 -->
             <img src="{{ user.userprofile.qr_code.url }}" alt="會員 QR Code" class="img-fluid" style="max-width: 400px;">
