@@ -91,6 +91,8 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import UserProfile
+from django.contrib.auth import get_user_model
+User = get_user_model()  # ✅ 使用你的自訂 User model
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True, label="電子郵件")
@@ -106,12 +108,9 @@ class UserRegistrationForm(UserCreationForm):
         user.email = self.cleaned_data["email"]
         if commit:
             user.save()
-        
-            # 確保 `UserProfile` 被正確創建，並儲存 phone
             profile, created = UserProfile.objects.get_or_create(user=user)
-            profile.phone = self.cleaned_data["phone"]  # 儲存 phone 到 UserProfile
+            profile.phone = self.cleaned_data["phone"]
             profile.save()
-
         return user
 # member/forms.py
 from django import forms

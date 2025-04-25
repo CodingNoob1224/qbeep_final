@@ -38,12 +38,26 @@ from .forms import UserRegistrationForm
 
 #     return render(request, "registration/register.html", {"form": form})
 
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserRegistrationForm(request.POST)
+#         if form.is_valid():
+#             # 儲存用戶並創建 UserProfile
+#             form.save()
+#             return redirect('event_list')
+#     else:
+#         form = UserRegistrationForm()
+
+#     return render(request, 'registration/register.html', {'form': form})
+from django.contrib.auth import login
+
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            # 儲存用戶並創建 UserProfile
-            form.save()
+            user = form.save()
+            login(request, user)  # ✅ 自動登入
+            messages.success(request, "註冊成功，您已自動登入")
             return redirect('event_list')
     else:
         form = UserRegistrationForm()
@@ -155,17 +169,22 @@ def check_in_user(request, event_id):
 #    else:
 #        form = UserRegistrationForm()
 
-def register(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            print("Phone:", form.cleaned_data.get('phone'))  # 打印出 phone 的值，檢查是否正確傳遞
-            form.save()
-            return redirect('login')
-    else:
-        form = UserRegistrationForm()
+# from django.contrib.auth import login
+# from django.contrib import messages
 
-    return render(request, 'registration/register.html', {'form': form})
+# def register(request):
+#     if request.method == 'POST':
+#         form = UserRegistrationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             print("註冊成功的使用者：", user)
+#             login(request, user)  # ✅ 自動登入
+#             messages.success(request, "註冊成功，您已自動登入")
+#             return redirect("event_list")
+#     else:
+#         form = UserRegistrationForm()
+
+#     return render(request, "registration/register.html", {"form": form})
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login
@@ -206,7 +225,9 @@ def set_new_password(request):
 
             # 自動登入並清除 session
             login(request, user)
-            del request.session["reset_user_id"]
+            # del request.session["reset_user_id"]
+            request.session.pop("reset_user_id", None)
+
             messages.success(request, "密碼已成功重設，您已自動登入")
             return redirect("event_list")  # 你可以換成首頁的路由名稱
     else:

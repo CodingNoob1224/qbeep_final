@@ -13,5 +13,6 @@ urlpatterns = [
     path('forms/', views.feedback_dashboard, name='dashboard'),
     path('forms/<int:event_id>/fill/', views.fill_form, name='fill_form'),
     path('forms/<int:event_id>/analysis/', views.form_analysis, name='form_analysis'),
+    path('draw/<int:event_id>/', views.draw_winners, name='draw_winners'),
 
 ]

@@ -9,12 +9,42 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 import json
 
+from django.utils.timezone import make_aware
+from datetime import datetime
+from events.models import Event
+from django.shortcuts import render
+
 def event_list(request):
     events = Event.objects.all()
+    activity_type = request.GET.get('activity_type')
+    start_time = request.GET.get('start_time')
+    end_time = request.GET.get('end_time')
+
+    # 篩選：活動類別
+    if activity_type:
+        events = events.filter(activity_type=activity_type)
+
+    # 篩選：開始時間（需要轉為 timezone-aware 的 datetime）
+    if start_time:
+        try:
+            start_dt = make_aware(datetime.fromisoformat(start_time))
+            events = events.filter(event_time__gte=start_dt)
+        except:
+            pass  # 避免格式錯誤直接炸掉
+
+    # 篩選：結束時間（你可能是指活動時間要早於這個時間）
+    if end_time:
+        try:
+            end_dt = make_aware(datetime.fromisoformat(end_time))
+            events = events.filter(event_time__lte=end_dt)
+        except:
+            pass
+
     return render(request, 'events/event_list.html', {
         'events': events,
-        'now': now(),
+        'now': datetime.now(),  # 提供 now 給 template 判斷活動是否結束
     })
+
 
 
 # def event_detail(request, event_id):

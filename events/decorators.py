@@ -15,3 +15,4 @@ def has_event_permission(view_func):
 
         return HttpResponseForbidden("您沒有權限管理此活動。")
     return _wrapped_view
+

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'member',
     'feedback',
     'django_bootstrap5',
+    
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'events.context_processors.is_event_manager',
             ],
         },
     },

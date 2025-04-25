@@ -47,9 +47,40 @@ def check_detail(request, event_id):
         'winners': winners  # 傳遞中獎者資料
     })
 
+# def event_analysis(request):
+#     user = request.user
+
+#     if user.is_staff:
+#         events = Event.objects.all()
+#     else:
+#         events = Event.objects.filter(managers=user)
+
+#     event_data = []
+
+#     for event in events:
+#         registrations_count = Registration.objects.filter(event=event, status='registered').count()
+
+#         # ✅ 正確放在 for 迴圈裡面
+#         form = Form.objects.filter(event=event).first()
+#         if form:
+#             responses = Response.objects.filter(form=form)
+#             feedback_count = responses.count()
+
+#         event_data.append({
+#             'event': event,
+#             'registrations_count': registrations_count,
+#             'feedback_count': feedback_count,
+#         })
+
+#     return render(request, 'feedback/event_analysis.html', {
+#         'event_data': event_data
+#     })
+
+@login_required
 def event_analysis(request):
     user = request.user
 
+    # 管理員看到所有活動，負責人看到自己負責的活動
     if user.is_staff:
         events = Event.objects.all()
     else:
@@ -59,12 +90,8 @@ def event_analysis(request):
 
     for event in events:
         registrations_count = Registration.objects.filter(event=event, status='registered').count()
-
-        # ✅ 正確放在 for 迴圈裡面
         form = Form.objects.filter(event=event).first()
-        if form:
-            responses = Response.objects.filter(form=form)
-            feedback_count = responses.count()
+        feedback_count = Response.objects.filter(form=form).count() if form else 0
 
         event_data.append({
             'event': event,
@@ -75,32 +102,83 @@ def event_analysis(request):
     return render(request, 'feedback/event_analysis.html', {
         'event_data': event_data
     })
+
 # 抽獎管理員頁面
 def is_admin(user):
     return user.is_staff
 
-@user_passes_test(is_admin)
+# @user_passes_test(is_admin)
+# def draw_home(request):
+#     events = Event.objects.all()
+#     return render(request, 'draw_home.html', {'events': events})
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def draw_home(request):
-    events = Event.objects.all()
+    user = request.user
+
+    if user.is_staff:
+        events = Event.objects.all()
+    else:
+        events = Event.objects.filter(managers=user)
+
     return render(request, 'draw_home.html', {'events': events})
 
-@user_passes_test(is_admin)
+# @user_passes_test(is_admin)
+# def draw_winners(request):
+#     if request.method == "POST":
+#         event_id = request.POST.get("event_id")
+#         num_winners = int(request.POST.get("num_winners", 1))
+
+#         event = get_object_or_404(Event, id=event_id)
+
+#         # 取得所有簽到的使用者
+#         checked_in_users = Registration.objects.filter(
+#             event=event, status="registered"
+#         ).values_list("user_id", "user__username")
+
+#         # 取得所有已經中獎的使用者
+#         existing_winners = Winner.objects.filter(event=event).values_list("user_id", flat=True)
+
+#         # 只從未中獎的人裡面抽
+#         eligible_users = [user for user in checked_in_users if user[0] not in existing_winners]
+
+#         if len(eligible_users) < num_winners:
+#             return render(request, 'draw_detail.html', {
+#                 "winners": [], "error": "可抽獎人數不足"
+#             })
+
+#         # 隨機選擇中獎者
+#         selected_winners = random.sample(eligible_users, num_winners)
+#         winners_list = []
+#         for user in selected_winners:
+#             Winner.objects.create(event=event, user_id=user[0])
+#             winners_list.append({"name": user[1]})
+
+#         return render(request, 'draw_detail.html', {"winners": winners_list})
+
+#     return redirect('draw_home')
+from events.decorators import has_event_permission
+
+@login_required
 def draw_winners(request):
     if request.method == "POST":
         event_id = request.POST.get("event_id")
         num_winners = int(request.POST.get("num_winners", 1))
 
         event = get_object_or_404(Event, id=event_id)
+        user = request.user
 
-        # 取得所有簽到的使用者
+        # ✅ 權限檢查：活動負責人或後台管理員
+        if not (user.is_staff or user in event.managers.all()):
+            return render(request, '403.html', status=403)
+
         checked_in_users = Registration.objects.filter(
             event=event, status="registered"
         ).values_list("user_id", "user__username")
 
-        # 取得所有已經中獎的使用者
         existing_winners = Winner.objects.filter(event=event).values_list("user_id", flat=True)
 
-        # 只從未中獎的人裡面抽
         eligible_users = [user for user in checked_in_users if user[0] not in existing_winners]
 
         if len(eligible_users) < num_winners:
@@ -108,7 +186,6 @@ def draw_winners(request):
                 "winners": [], "error": "可抽獎人數不足"
             })
 
-        # 隨機選擇中獎者
         selected_winners = random.sample(eligible_users, num_winners)
         winners_list = []
         for user in selected_winners:
@@ -173,31 +250,83 @@ from django.db.models import Avg
 from collections import Counter
 import json
 
-@user_passes_test(lambda u: u.is_staff)
+# @user_passes_test(lambda u: u.is_staff)
+# def form_analysis(request, event_id):
+#     form = get_object_or_404(Form, event_id=event_id)
+#     questions = form.questions.all()
+#     responses = Response.objects.filter(form=form)
+
+#     total_registrants = Registration.objects.filter(event=form.event, status='registered').count()
+#     total_responses = responses.count()
+#     response_rate = round((total_responses / total_registrants) * 100, 2) if total_registrants > 0 else 0
+
+#     # 預設取第一題為評分題
+#     first_rating_q = questions.filter(question_type='rating').first()
+#     avg_score = None
+#     if first_rating_q:
+#         avg_score = Answer.objects.filter(
+#             question=first_rating_q,
+#             response__form=form
+#         ).aggregate(avg=Avg('content'))['avg']
+
+#     # 整理每題答案列表
+#     answers = {
+#         q: Answer.objects.filter(question=q, response__form=form)
+#         for q in questions
+#     }
+#     # 整理問答題答案（避免 template 裡 index dict）
+#     text_answers = []
+#     for q in questions:
+#         if q.question_type == 'text':
+#             text_answers.append({
+#                 'question': q,
+#                 'answers': Answer.objects.filter(question=q, response__form=form)
+#             })
+
+#     # 建立 Chart.js 資料格式
+#     chart_data = {}
+#     for q in questions:
+#         if q.question_type in ['rating', 'single_choice']:
+#             counter = Counter(a.content for a in answers[q])
+#             chart_data[q.id] = dict(counter)
+
+#     return render(request, 'feedback/form_analysis.html', {
+#         'form': form,
+#         'questions': questions,
+#         'responses': responses,
+#         'answers': answers,  # 給圖表用
+#         'avg_score': avg_score,
+#         'response_rate': response_rate,
+#         'chart_data': json.dumps(chart_data),
+#         'text_answers': text_answers,  # 新增的
+#     })
+@login_required
 def form_analysis(request, event_id):
     form = get_object_or_404(Form, event_id=event_id)
+    event = form.event
+
+    # 權限檢查：管理員或活動的其中一位負責人才可以看
+    if not (request.user.is_staff or request.user in event.managers.all()):
+        return render(request, '403.html', status=403)
+
     questions = form.questions.all()
     responses = Response.objects.filter(form=form)
 
-    total_registrants = Registration.objects.filter(event=form.event, status='registered').count()
+    total_registrants = Registration.objects.filter(event=event, status='registered').count()
     total_responses = responses.count()
     response_rate = round((total_responses / total_registrants) * 100, 2) if total_registrants > 0 else 0
 
-    # 預設取第一題為評分題
     first_rating_q = questions.filter(question_type='rating').first()
-    avg_score = None
-    if first_rating_q:
-        avg_score = Answer.objects.filter(
-            question=first_rating_q,
-            response__form=form
-        ).aggregate(avg=Avg('content'))['avg']
+    avg_score = Answer.objects.filter(
+        question=first_rating_q,
+        response__form=form
+    ).aggregate(avg=Avg('content'))['avg'] if first_rating_q else None
 
-    # 整理每題答案列表
     answers = {
         q: Answer.objects.filter(question=q, response__form=form)
         for q in questions
     }
-    # 整理問答題答案（避免 template 裡 index dict）
+
     text_answers = []
     for q in questions:
         if q.question_type == 'text':
@@ -206,7 +335,6 @@ def form_analysis(request, event_id):
                 'answers': Answer.objects.filter(question=q, response__form=form)
             })
 
-    # 建立 Chart.js 資料格式
     chart_data = {}
     for q in questions:
         if q.question_type in ['rating', 'single_choice']:
@@ -217,10 +345,9 @@ def form_analysis(request, event_id):
         'form': form,
         'questions': questions,
         'responses': responses,
-        'answers': answers,  # 給圖表用
+        'answers': answers,
         'avg_score': avg_score,
         'response_rate': response_rate,
         'chart_data': json.dumps(chart_data),
-        'text_answers': text_answers,  # 新增的
+        'text_answers': text_answers,
     })
-

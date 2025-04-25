@@ -147,7 +147,8 @@
     <h1>{{ event.name }} - 參加者列表</h1>
     <p>活動時間: {{ event.event_time }}</p>
 
-    {% if user.is_staff %}
+    {% comment %} {% if user.is_staff %} {% endcomment %}
+    {% if user in event.managers.all or user.is_staff %}
     <a href="{% url 'form_analysis' event.id %}" class="btn btn-outline-primary">
         查看問卷統計分析
     </a>
