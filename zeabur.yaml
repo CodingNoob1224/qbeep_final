@@ -1,0 +1,3 @@
+static:
+  - url: /media/
+    directory: /app/media/
