@@ -75,7 +75,7 @@ qbeep_final/
 
 ## 🌍 Demo 網站（由 Zeabur 部署）
 
-👉 [https://qbeepprojectv1test.zeabur.app](https://qbeepprojectv1test.zeabur.app)
+👉 [https://qbeep.zeabur.app/](https://qbeep.zeabur.app/)
 
 ## 🙌 製作人
 

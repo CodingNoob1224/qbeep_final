@@ -55,8 +55,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://qbeepprojectv1test.zeabur.app",
-    "http://qbeepprojectv1test.zeabur.app",
+    "https://qbeep.zeabur.app",
+    "http://qbeep.zeabur.app",
 ]
 
 ROOT_URLCONF = 'project.urls'
