@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-bnpk&8ac@96l5yi@-7(@nsv^iu_*$f+gxrco9_qdhlhk(2y6ns
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['qbeepprojectv1test.zeabur.app']
+ALLOWED_HOSTS = ['qbeep.zeabur.app']
 
 
 # Application definition
