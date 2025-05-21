@@ -13,26 +13,27 @@ from django.utils.timezone import make_aware
 from datetime import datetime
 from events.models import Event
 from django.shortcuts import render
+from django.core.paginator import Paginator
 
 def event_list(request):
-    events = Event.objects.all()
+    events = Event.objects.all().order_by('-published_time')  # ✅ 新到舊排序
     activity_type = request.GET.get('activity_type')
     start_time = request.GET.get('start_time')
     end_time = request.GET.get('end_time')
 
-    # 篩選：活動類別
+    # ✅ 篩選活動類別
     if activity_type:
         events = events.filter(activity_type=activity_type)
 
-    # 篩選：開始時間（需要轉為 timezone-aware 的 datetime）
+    # ✅ 篩選開始時間
     if start_time:
         try:
             start_dt = make_aware(datetime.fromisoformat(start_time))
             events = events.filter(event_time__gte=start_dt)
         except:
-            pass  # 避免格式錯誤直接炸掉
+            pass
 
-    # 篩選：結束時間（你可能是指活動時間要早於這個時間）
+    # ✅ 篩選結束時間
     if end_time:
         try:
             end_dt = make_aware(datetime.fromisoformat(end_time))
@@ -40,9 +41,15 @@ def event_list(request):
         except:
             pass
 
+    # ✅ 分頁功能，每頁 10 筆
+    paginator = Paginator(events, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'events/event_list.html', {
-        'events': events,
-        'now': datetime.now(),  # 提供 now 給 template 判斷活動是否結束
+        'events': page_obj,      # ✅ 傳遞分頁後的資料
+        'now': now(),
+        'page_obj': page_obj     # ✅ 傳遞分頁物件供 HTML 使用
     })
 
 
@@ -422,3 +429,4 @@ def import_registrations_csv(request, event_id):
         'event': event,
         'messages': messages
     })
+    from django.shortcuts import render, get_object_or_404

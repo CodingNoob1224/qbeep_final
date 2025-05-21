@@ -1,33 +1,82 @@
 <!-- events/templates/events/check_in_page.html -->
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
-
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}簽到頁面{% endblock %}
 
 {% block content %}
-<h1>活動簽到</h1>
-<p>活動名稱: {{ event.name }}</p>
-<p>活動時間: {{ event.event_time }}</p>
+<!-- QR Code Scanner Library -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 
-<div id="reader" style="width: 300px; margin: auto"></div>
-<div id="result" style="margin-top: 20px; text-align: center; font-size: 1.2em; color: red;"></div>
+<!-- Responsive Styling -->
+<style>
+  .check-in-container {
+    max-width: 600px;
+    margin: auto;
+    padding: 1rem;
+  }
 
+  .check-in-container h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .check-in-container p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  #reader {
+    width: 100%;
+    max-width: 300px;
+    margin: 1rem auto;
+  }
+
+  #result {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1.2em;
+    color: red;
+  }
+
+  @media (max-width: 480px) {
+    .check-in-container h1 {
+      font-size: 1.5rem;
+    }
+
+    #result {
+      font-size: 1em;
+    }
+  }
+</style>
+
+<div class="check-in-container">
+  <h1>活動簽到</h1>
+  <p><strong>活動名稱:</strong> {{ event.name }}</p>
+  <p><strong>活動時間:</strong> {{ event.event_time }}</p>
+
+  <div id="reader"></div>
+  <div id="result"></div>
+</div>
+
+<!-- QR Code Scanner Script -->
 <script>
-  // 檢查瀏覽器是否支持攝像頭
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert("您的瀏覽器不支持攝像頭功能，請更換瀏覽器或設備。");
   } else {
-    // 嘗試訪問攝像頭
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(function (stream) {
+      .then(function () {
         console.log("攝像頭已啟用");
+
+        let isSmallScreen = window.innerWidth < 500;
+        let qrBoxSize = isSmallScreen ? 200 : 250;
 
         let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
           fps: 10,
-          qrbox: 250,
+          qrbox: qrBoxSize,
         });
 
-        // 渲染並開始掃描
         html5QrcodeScanner.render(onScanSuccess, onScanError);
       })
       .catch(function (error) {
@@ -36,7 +85,6 @@
       });
   }
 
-  // 當掃描成功時的回調函數
   function onScanSuccess(decodedText) {
     console.log("掃描到的 QR Code:", decodedText);
 
@@ -55,30 +103,27 @@
     .then(data => {
       console.log("後端回應:", data);
 
+      const resultDiv = document.getElementById("result");
       if (data.success) {
-        // 顯示簽到成功訊息
-        document.getElementById("result").innerHTML = `<span style="color: green;">${data.message}</span>`;
-
-        // 2 秒後自動返回上一頁
+        resultDiv.innerHTML = `<span style="color: green;">${data.message}</span>`;
         setTimeout(() => {
           window.history.back();
         }, 2000);
       } else {
-        // 顯示錯誤訊息
-        document.getElementById("result").innerHTML = `<span style="color: red;">簽到失敗: ${data.message}</span>`;
+        resultDiv.innerHTML = `<span style="color: red;">簽到失敗: ${data.message}</span>`;
       }
     })
     .catch(error => {
       console.error("錯誤:", error);
-      document.getElementById("result").innerHTML = `<span style="color: red;">無法提交簽到數據，請稍後再試。</span>`;
+      document.getElementById("result").innerHTML =
+        `<span style="color: red;">無法提交簽到數據，請稍後再試。</span>`;
     });
   }
 
-  // 當掃描錯誤時的回調函數
   function onScanError(errorMessage) {
     console.warn("掃描錯誤:", errorMessage);
-    document.getElementById("result").innerHTML = `<span style="color: red;">掃描錯誤，請再試一次。</span>`;
+    document.getElementById("result").innerHTML =
+      `<span style="color: red;">掃描錯誤，請再試一次。</span>`;
   }
 </script>
-
 {% endblock %}

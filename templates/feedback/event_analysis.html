@@ -3,126 +3,114 @@
 {% block title %}活動分析{% endblock %}
 
 {% block content %}
-<!-- <h1>活動分析</h1>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>活動名稱</th>
-            <th>活動時間</th>
-            <th>參加人數</th>
-            <th>回饋數量</th>
-            <th>查看詳情</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for data in event_data %}
-        <tr>
-            <td>{{ data.event.name }}</td>
-            <td>{{ data.event.event_time }}</td>
-            <td>{{ data.registrations_count }}</td>
-            <td>{{ data.feedback_count }}</td>
-            <td>
-                <a href="{% url 'check_detail' data.event.id %}" class="btn btn-primary">查看</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5" class="text-center">尚無活動記錄</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table> -->
-
-
-
-
-
-
-<!-- ✅ 新增樣式：加大容器與字體 -->
 <style>
+  .analysis-container {
+    max-width: 90%;
+    width: 72rem;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.08);
+    font-size: 1.05rem;
+  }
+
+  .analysis-container h1 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #0d6efd;
+  }
+
+  .table thead th {
+    text-align: center;
+    background-color: #f1f3f5;
+    color: #495057;
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .table tbody td {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 0.98rem;
+  }
+
+  .table tbody tr:hover {
+    background-color: #f0f8ff;
+  }
+
+  .btn-primary {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+  }
+
+  .text-center {
+    font-size: 1rem;
+    color: #6c757d;
+  }
+
+  /* ✅ 小螢幕支援橫向捲動 */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 480px) {
     .analysis-container {
-        max-width: 1200px; /* ✅ 放大容器寬度 */
-        margin: 60px auto;
-        padding: 50px;
-        background-color: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-        font-size: 1.1rem; /* ✅ 全域字體略微放大 */
+      padding: 1.25rem;
     }
 
     .analysis-container h1 {
-        text-align: center;
-        font-size: 2.3rem; /* ✅ 標題放大 */
-        font-weight: bold;
-        margin-bottom: 40px;
-        color: #0d6efd;
+      font-size: 1.5rem;
     }
 
-    .table thead th {
-        text-align: center;
-        background-color: #f1f3f5;
-        color: #495057;
-        font-weight: 600;
-        font-size: 1.1rem; /* ✅ 標題列字體放大 */
-    }
-
+    .table thead th,
     .table tbody td {
-        text-align: center;
-        vertical-align: middle;
-        font-size: 1.05rem; /* ✅ 表格內容字體略大 */
-    }
-
-    .table tbody tr:hover {
-        background-color: #f0f8ff;
+      font-size: 0.9rem;
     }
 
     .btn-primary {
-        font-size: 1rem; /* ✅ 查看按鈕字體放大 */
-        padding: 8px 16px;
-        border-radius: 6px;
+      font-size: 0.9rem;
     }
-
-    .text-center {
-        font-size: 1.1rem;
-        color: #6c757d;
-    }
+  }
 </style>
 
-<!-- ✅ 使用加大容器包裹內容 -->
 <div class="analysis-container">
-    <h1>活動分析</h1>
+  <h1>活動分析</h1>
 
+  <!-- ✅ 加上 table-responsive 以便手機橫滑 -->
+  <div class="table-responsive">
     <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>活動名稱</th>
-                <th>活動時間</th>
-                <th>參加人數</th>
-                <th>回饋數量</th>
-                <th>查看詳情</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in event_data %}
-            <tr>
-                <td>{{ data.event.name }}</td>
-                <td>{{ data.event.event_time }}</td>
-                <td>{{ data.registrations_count }}</td>
-                <td>{{ data.feedback_count }}</td>
-                <td>
-                    <a href="{% url 'check_detail' data.event.id %}" class="btn btn-primary">查看</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center">尚無活動記錄</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+      <thead>
+        <tr>
+          <th>活動名稱</th>
+          <th>活動時間</th>
+          <th>參加人數</th>
+          <th>回饋數量</th>
+          <th>查看詳情</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for data in event_data %}
+        <tr>
+          <td>{{ data.event.name }}</td>
+          <td>{{ data.event.event_time }}</td>
+          <td>{{ data.registrations_count }}</td>
+          <td>{{ data.feedback_count }}</td>
+          <td>
+            <a href="{% url 'check_detail' data.event.id %}" class="btn btn-primary">查看</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center">尚無活動記錄</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
+  </div>
 </div>
-
-
-
-
 {% endblock %}

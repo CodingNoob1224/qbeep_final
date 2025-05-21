@@ -1,62 +1,101 @@
-
-<!-- member/templates/member/edit_profile.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- <h2>編輯個人資料</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-
-    <button type="submit">儲存</button>
-</form>
-
-<a href="{% url 'password_change' %}">更改密碼</a> -->
-
-
-
-
-<!-- 修改：標題置中 + 加大字體 -->
-<h2 style="font-size: 2em; font-weight: bold; margin-bottom: 20px; color: #333; text-align: center;">
-    編輯個人資料
-</h2>
-
-<!-- 修改：表單區塊優化（圓角、陰影、內距） -->
-<form method="post" 
-      style="max-width: 500px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-    {% csrf_token %}
-
-    <!-- 修改：表單欄位優化，手動處理欄位對齊樣式 -->
-    <div style="display: flex; flex-direction: column; gap: 20px;">
-        {{ form.as_p }} <!-- 保持原有格式，若要更細緻自訂欄位可拆開處理 -->
-    </div>
-
-    <!-- 修改：按鈕顏色 + 圓角 + 滑鼠懸停效果 -->
-    <button type="submit" 
-            style="width: 100%; padding: 12px 0; background-color: #007BFF; color: white; border: none; border-radius: 8px; font-size: 1em; cursor: pointer; transition: background-color 0.3s;">
-        儲存
-    </button>
-</form>
-
-<!-- 修改：更改密碼連結樣式 -->
-<div style="text-align: center; margin-top: 20px;">
-    <a href="{% url 'password_change' %}" 
-       style="color: #007BFF; text-decoration: none; font-size: 1.1em; transition: color 0.3s;">
-       更改密碼
-    </a>
-</div>
-
-<!-- 新增：按鈕和連結的滑鼠懸停效果 -->
 <style>
-    button:hover {
-        background-color: #0056b3; /* 按鈕顏色變深 */
+  .profile-edit-container {
+    max-width: 90%;
+    width: 32rem;
+    margin: 3rem auto;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-edit-container h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+
+  .profile-edit-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .profile-edit-container input,
+  .profile-edit-container select,
+  .profile-edit-container textarea {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .profile-edit-container button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .profile-edit-container button:hover {
+    background-color: #0056b3;
+  }
+
+  .profile-edit-container .change-password {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  .profile-edit-container .change-password a {
+    color: #007BFF;
+    text-decoration: none;
+    font-size: 1.05rem;
+    transition: color 0.3s;
+  }
+
+  .profile-edit-container .change-password a:hover {
+    color: #0056b3;
+  }
+
+  @media (max-width: 480px) {
+    .profile-edit-container {
+      padding: 1.25rem;
     }
 
-    a:hover {
-        color: #0056b3; /* 連結顏色變深 */
+    .profile-edit-container h2 {
+      font-size: 1.5rem;
     }
+
+    .profile-edit-container button {
+      font-size: 0.95rem;
+    }
+  }
 </style>
 
+<div class="profile-edit-container">
+  <h2>編輯個人資料</h2>
 
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">儲存</button>
+  </form>
+
+  <div class="change-password">
+    <a href="{% url 'password_change' %}">更改密碼</a>
+  </div>
+</div>
 {% endblock %}

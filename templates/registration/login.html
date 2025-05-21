@@ -1,85 +1,79 @@
-{% extends 'base.html' %}  <!-- 繼承基礎模板 -->
+{% extends 'base.html' %}
 
-{% block title %}登入{% endblock %}  <!-- 設定標題 -->
+{% block title %}登入{% endblock %}
 
-{% block content %}  <!-- 定義內容區塊 -->
-   <!-- <h2>登入</h2>
-    {% if form.errors %}
-        <p style="color: red;">登入失敗，請檢查用戶名和密碼。</p>
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">登入</button>
-    </form>
-    <p>還沒有帳號？<a href="{% url 'register' %}">註冊</a></p>
-    <p><a href="{% url 'password_reset_by_phone' %}">忘記密碼？</a></p>  <!- 新增忘記密碼連結 -> --> 
+{% block content %}
+<style>
+  .login-container {
+    max-width: 90%;
+    width: 32rem;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+  }
 
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
 
-    <title>登入</title>
+  .login-container button {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
 
-    <!-- 引入 Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  @media (max-width: 480px) {
+    .login-container {
+      padding: 1.25rem;
+    }
 
-    <style>
-        /* 讓整體登入區塊置中 */
-        .login-container {
-            max-width: 500px;
-            margin: 100px auto;
-            padding: 30px;
-        }
-        /* 讓標籤靠右對齊 */
-        .form-label {
-            text-align: right;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container border rounded shadow-sm">
-        <h2 class="text-center mb-4">登入</h2>
+    .form-label {
+      text-align: left !important;
+      font-size: 0.95rem;
+    }
 
-        {% if form.errors %}
-            <div class="alert alert-danger text-center">
-                登入失敗，請檢查用戶名和密碼。
-            </div>
-        {% endif %}
+    .login-container button {
+      font-size: 0.95rem;
+    }
+  }
+</style>
 
-        <form method="post">
-            {% csrf_token %}
+<div class="login-container border">
+  <h2 class="text-center mb-4">登入</h2>
 
-            <!-- 手動呈現每個欄位，並用 row/col 排版對齊 -->
-            <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label form-label">使用者名稱</label>
-                <div class="col-sm-9">
-                    {{ form.username }}
-                    {% if form.username.errors %}
-                        <div class="text-danger small">{{ form.username.errors|striptags }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label form-label">密碼</label>
-                <div class="col-sm-9">
-                    {{ form.password }}
-                    {% if form.password.errors %}
-                        <div class="text-danger small">{{ form.password.errors|striptags }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">登入</button>
-        </form>
-
-        <div class="text-center mt-3">
-            <p>還沒有帳號？</p>
-            <p><a href="{% url 'register' %}">註冊</a></p>
-            <p><a href="{% url 'password_reset_by_phone' %}">忘記密碼</a></p>
-        </div>
+  {% if form.errors %}
+    <div class="alert alert-danger text-center">
+      登入失敗，請檢查用戶名和密碼。
     </div>
-</body>
+  {% endif %}
 
+  <form method="post">
+    {% csrf_token %}
 
+    <div class="mb-3">
+      <label class="form-label">使用者名稱</label>
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div class="text-danger small">{{ form.username.errors|striptags }}</div>
+      {% endif %}
+    </div>
 
+    <div class="mb-3">
+      <label class="form-label">密碼</label>
+      {{ form.password }}
+      {% if form.password.errors %}
+        <div class="text-danger small">{{ form.password.errors|striptags }}</div>
+      {% endif %}
+    </div>
 
+    <button type="submit" class="btn btn-primary w-100">登入</button>
+  </form>
+
+  <div class="text-center mt-4">
+    <p>還沒有帳號？<a href="{% url 'register' %}">註冊</a></p>
+    <p><a href="{% url 'password_reset_by_phone' %}">忘記密碼？</a></p>
+  </div>
+</div>
 {% endblock %}

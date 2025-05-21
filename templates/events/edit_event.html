@@ -1,101 +1,100 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <!-- <h2>編輯活動</h2>
-    
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">更新活動</button>
-    </form>
-
-    <a href="{% url 'event_detail' event.id %}">返回活動詳細資訊</a> -->
-
-
-
-
-
-<!-- ✅ 新增：樣式區塊，提升視覺美感 -->
 <style>
+  .edit-event-container {
+    max-width: 90%;
+    width: 42rem;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+  }
+
+  .edit-event-container h2 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    color: #0d6efd;
+  }
+
+  .edit-event-container form {
+    margin-bottom: 1.5rem;
+  }
+
+  .edit-event-container form button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #0d6efd;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+
+  .edit-event-container form button:hover {
+    background-color: #0b5ed7;
+  }
+
+  .edit-event-container a {
+    display: block;
+    text-align: center;
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    color: #6c757d;
+    text-decoration: none;
+  }
+
+  .edit-event-container a:hover {
+    text-decoration: underline;
+  }
+
+  .edit-event-container input,
+  .edit-event-container select,
+  .edit-event-container textarea {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  /* ✅ 手機版調整 */
+  @media (max-width: 480px) {
     .edit-event-container {
-        max-width: 700px;
-        margin: 60px auto;
-        padding: 40px;
-        background-color: rgba(255, 255, 255, 0.95); /* 半透明白底容器 */
-        border-radius: 15px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      padding: 1.25rem;
     }
 
     .edit-event-container h2 {
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 30px;
-        color: #0d6efd;
-    }
-
-    .edit-event-container form {
-        margin-bottom: 30px;
+      font-size: 1.5rem;
     }
 
     .edit-event-container form button {
-        display: block;
-        width: 100%;
-        padding: 12px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
-        background-color: #0d6efd;
-        color: white;
-        transition: background-color 0.3s ease;
-    }
-
-    .edit-event-container form button:hover {
-        background-color: #0b5ed7;
+      font-size: 1rem;
     }
 
     .edit-event-container a {
-        display: block;
-        text-align: center;
-        margin-top: 10px;
-        font-size: 1rem;
-        color: #6c757d;
-        text-decoration: none;
+      font-size: 0.95rem;
     }
-
-    .edit-event-container a:hover {
-        text-decoration: underline;
-    }
-
-    /* ✅ 強化預設欄位樣式（表單美化） */
-    .edit-event-container input,
-    .edit-event-container select,
-    .edit-event-container textarea {
-        width: 100%;
-        padding: 10px 12px;
-        margin-bottom: 16px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        box-sizing: border-box;
-        font-size: 1rem;
-    }
+  }
 </style>
 
-<!-- ✅ 包覆整體的容器 class -->
 <div class="edit-event-container">
-    <h2>編輯活動</h2>
+  <h2>編輯活動</h2>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}  <!-- ✅ 保留原邏輯：自動呈現表單欄位 -->
-        <button type="submit" class="btn btn-primary">更新活動</button> <!-- ✅ 保留原按鈕行為，套用美化樣式 -->
-    </form>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">更新活動</button>
+  </form>
 
-    <!-- ✅ 美化後的返回連結 -->
-    <a href="{% url 'event_detail' event.id %}">返回活動詳細資訊</a>
+  <a href="{% url 'event_detail' event.id %}">返回活動詳細資訊</a>
 </div>
-
-
-
-
 {% endblock %}

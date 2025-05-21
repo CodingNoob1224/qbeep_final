@@ -3,57 +3,116 @@
 {% block title %}會員資訊{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 700px; margin: auto;">
+<style>
+  .profile-container {
+    max-width: 90%;
+    width: 44rem;
+    margin: 3rem auto;
+    padding-bottom: 2rem;
+  }
 
-    <!-- ✅ QR Code 區塊 -->
-    <div class="text-center mb-4">
-        <p class="fw-bold">掃描此 QR Code 進行簽到</p>
+  .qr-section img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+  }
 
-        {% if qr_code_base64 %}
-            <!-- ✅ Base64 顯示 QR Code 圖片 -->
-            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="會員 QR Code" class="img-fluid" style="max-width: 400px;">
-        {% else %}
-            <p class="text-danger">無法顯示 QR Code，可能尚未生成。</p>
-        {% endif %}
+  .qr-section p {
+    font-size: 1.1rem;
+  }
+
+  .card h1 {
+    font-size: 1.25rem;
+  }
+
+  .card-header {
+    font-weight: 600;
+    background-color: #f8f9fa;
+  }
+
+  .card-body a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .card-body a:hover {
+    text-decoration: underline;
+  }
+
+  .list-group-item a {
+    color: #212529;
+    text-decoration: none;
+  }
+
+  .list-group-item a:hover {
+    color: #0d6efd;
+  }
+
+  @media (max-width: 480px) {
+    .qr-section p {
+      font-size: 1rem;
+    }
+
+    .card h1 {
+      font-size: 1.1rem;
+    }
+
+    .card-body a {
+      font-size: 0.95rem;
+    }
+
+    .list-group-item {
+      font-size: 0.95rem;
+    }
+  }
+</style>
+
+<div class="profile-container">
+
+  <!-- ✅ QR Code 區塊 -->
+  <div class="text-center mb-4 qr-section">
+    <p class="fw-bold">掃描此 QR Code 進行簽到</p>
+    {% if qr_code_base64 %}
+      <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="會員 QR Code" class="img-fluid">
+    {% else %}
+      <p class="text-danger">無法顯示 QR Code，可能尚未生成。</p>
+    {% endif %}
+  </div>
+
+  <!-- ✅ 會員姓名 -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h1 class="h5 mb-0"><strong>姓名：</strong> {{ user.username }}</h1>
     </div>
+  </div>
 
-    <!-- ✅ 會員姓名 -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h1 class="h5 mb-0"><strong>姓名：</strong> {{ user.username }}</h1>
-        </div>
+  <!-- ✅ 已報名活動 -->
+  <div class="card mb-4">
+    <div class="card-header">已報名的活動</div>
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        {% for registration in registrations %}
+          <li class="list-group-item">
+            <a href="{% url 'event_detail' registration.event.id %}">
+              {{ registration.event.name }} - {{ registration.event.event_time }}
+            </a>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">您尚未報名任何活動。</li>
+        {% endfor %}
+      </ul>
     </div>
+  </div>
 
-    <!-- ✅ 已報名活動 -->
-    <div class="card mb-4">
-        <div class="card-header">
-            已報名的活動
-        </div>
-        <div class="card-body">
-            <ul class="list-group list-group-flush">
-                {% for registration in registrations %}
-                    <li class="list-group-item">
-                        <a href="{% url 'event_detail' registration.event.id %}">
-                            {{ registration.event.name }} - {{ registration.event.event_time }}
-                        </a>
-                    </li>
-                {% empty %}
-                    <li class="list-group-item text-muted">您尚未報名任何活動。</li>
-                {% endfor %}
-            </ul>
-        </div>
+  <!-- ✅ 設定 -->
+  <div class="card mb-3">
+    <div class="card-header">⚙️ 設定</div>
+    <div class="card-body">
+      <p class="mb-0"><a href="{% url 'edit_profile' %}">編輯個人資料</a></p>
+      <p class="mb-0"><a href="{% url 'password_change' %}">修改密碼</a></p>
     </div>
-
-    <!-- ✅ 編輯個人資訊 -->
-    <div class="card mb-3">
-        <div class="card-header">
-            ⚙️設定
-        </div>
-        <div class="card-body">
-            <p class="mb-0"><a href="{% url 'edit_profile' %}">編輯個人資料</a></p>
-            <p class="mb-0"><a href="{% url 'password_change' %}">修改密碼</a></p>
-        </div>
-    </div>
+  </div>
 
 </div>
 {% endblock %}

@@ -1,8 +1,53 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container mt-4">
+<style>
+  .survey-complete-container {
+    max-width: 90%;
+    width: 32rem;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+
+  .survey-complete-container h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    color: #198754; /* 綠色強調 */
+  }
+
+  .survey-complete-container p {
+    font-size: 1.1rem;
+    color: #444;
+  }
+
+  .survey-complete-container .btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    max-width: 240px;
+  }
+
+  @media (max-width: 480px) {
+    .survey-complete-container {
+      padding: 1.25rem;
+    }
+
+    .survey-complete-container h2 {
+      font-size: 1.5rem;
+    }
+
+    .survey-complete-container p {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="survey-complete-container">
   <h2>您已經填寫過本活動的問卷</h2>
   <p>感謝您的參與！</p>
-  <a href="{% url 'event_list' %}" class="btn btn-secondary mt-3">回活動列表</a>
+  <a href="{% url 'event_list' %}" class="btn btn-secondary">← 回活動列表</a>
 </div>
 {% endblock %}

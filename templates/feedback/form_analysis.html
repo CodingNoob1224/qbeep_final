@@ -1,51 +1,115 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <style>
+  .analysis-container {
+    max-width: 90%;
+    width: 60rem;
+    margin: 3rem auto;
+    padding: 2rem;
+  }
+
+  .analysis-container h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0d6efd;
+    margin-bottom: 1.5rem;
+  }
+
+  .analysis-container h4 {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
   .small-pie-chart {
-    width: 500px !important;
-    height: 500px !important;
+    width: 100% !important;
+    max-width: 500px;
+    height: auto !important;
+  }
+
+  .response-list ul {
+    padding-left: 1.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .response-list li {
+    margin-bottom: 0.25rem;
+    line-height: 1.6;
+  }
+
+  .chart-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+  }
+
+  hr {
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 480px) {
+    .analysis-container h2 {
+      font-size: 1.5rem;
+    }
+
+    .analysis-container h4 {
+      font-size: 1.1rem;
+    }
+
+    .response-list li {
+      font-size: 0.95rem;
+    }
   }
 </style>
 
-<h2>活動回饋分析：{{ form.event.name }}</h2>
+<div class="analysis-container">
+  <h2>活動回饋分析：{{ form.event.name }}</h2>
 
-<p>📈 答題率：{{ response_rate }}%</p>
-{% if avg_score %}
-<p>⭐ 推薦平均分數（第一題）：{{ avg_score|floatformat:2 }}</p>
-{% endif %}
-
-<hr>
-{% for q in questions %}
-  {% if q.question_type in 'rating single_choice' %}
-    <div class="mb-5">
-      <h4>Q{{ forloop.counter }}：{{ q.content }}</h4>
-      <canvas id="chart_{{ q.id }}" class="my-2 small-pie-chart"></canvas>
-    </div>
+  <p>📈 答題率：{{ response_rate }}%</p>
+  {% if avg_score %}
+    <p>⭐ 推薦平均分數（第一題）：{{ avg_score|floatformat:2 }}</p>
   {% endif %}
-{% endfor %}
 
-<hr>
-<h4>📝 問答題回覆</h4>
-{% for item in text_answers %}
-  <div class="mb-5">
-    <h4>Q：{{ item.question.content }}</h4>
-    <ul>
-      {% for a in item.answers %}
-        <li>{{ a.content }}</li>
-      {% empty %}
-        <li><i>尚無回答</i></li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endfor %}
+  <hr>
 
-<hr>
-<h4>📋 所有填寫者</h4>
-<ul>
-  {% for r in responses %}
-    <li>{{ r.registration.user.username }} - {{ r.submit_time }}</li>
+  {% for q in questions %}
+    {% if q.question_type in 'rating single_choice' %}
+      <div class="mb-4">
+        <h4>Q{{ forloop.counter }}：{{ q.content }}</h4>
+        <div class="chart-wrapper">
+          <canvas id="chart_{{ q.id }}" class="small-pie-chart"></canvas>
+        </div>
+      </div>
+    {% endif %}
   {% endfor %}
-</ul>
+
+  <hr>
+  <h4>📝 問答題回覆</h4>
+  <div class="response-list">
+    {% for item in text_answers %}
+      <div class="mb-4">
+        <h5>Q：{{ item.question.content }}</h5>
+        <ul>
+          {% for a in item.answers %}
+            <li>{{ a.content }}</li>
+          {% empty %}
+            <li><i>尚無回答</i></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+
+  <hr>
+  <h4>📋 所有填寫者</h4>
+  <ul>
+    {% for r in responses %}
+      <li>{{ r.registration.user.username }} - {{ r.submit_time }}</li>
+    {% endfor %}
+  </ul>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -55,13 +119,11 @@
     const rawLabels = Object.keys(data);
     const rawValues = Object.values(data);
     const total = rawValues.reduce((sum, val) => sum + Number(val), 0);
-    const percentages = rawValues.map(val => ((val / total) * 100).toFixed(1));
-    const labelsWithPercent = rawLabels;  // <--- 改這裡！
 
     new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: labelsWithPercent,
+        labels: rawLabels,
         datasets: [{
           label: '回答比例',
           data: rawValues,
@@ -85,7 +147,7 @@
           tooltip: {
             callbacks: {
               label: function(context) {
-                const total = context.chart._metasets[0].total;
+                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
                 const value = context.raw;
                 const percent = ((value / total) * 100).toFixed(1);
                 return `回答比例: ${percent}%`;
@@ -97,7 +159,4 @@
     });
   }
 </script>
-
-
-
 {% endblock %}

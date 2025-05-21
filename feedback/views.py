@@ -351,3 +351,68 @@ def form_analysis(request, event_id):
         'chart_data': json.dumps(chart_data),
         'text_answers': text_answers,
     })
+from django.shortcuts import render, get_object_or_404
+from .ai_services import generate_event_report_with_gpt
+from events.models import Event, Registration
+from feedback.models import Response, Form, Answer
+from django.db.models import Avg
+from collections import Counter
+
+def generate_report_view(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+
+    # 基本統計
+    total_registrations = Registration.objects.filter(event=event, status='registered').count()
+    total_attendees = Registration.objects.filter(event=event, status='registered', check_in_time__isnull=False).count()
+
+    # 問卷統計
+    form = Form.objects.filter(event=event).first()
+    total_responses = Response.objects.filter(form=form).count() if form else 0
+
+    # 初始化問卷摘要文字
+    responses_summary = "目前尚無問卷資料"
+    if form and total_responses > 0:
+        responses = Response.objects.filter(form=form)
+        answers = Answer.objects.filter(response__in=responses)
+
+        summary_parts = []
+        for question in form.questions.all():
+            question_answers = answers.filter(question=question)
+
+            if question.question_type == 'rating':
+                avg = question_answers.aggregate(avg=Avg('content'))['avg']
+                summary_parts.append(f"「{question.content}」的平均評分為 {round(avg, 1) if avg else '尚無資料'}。")
+
+            elif question.question_type == 'single_choice':
+                count = Counter(a.content for a in question_answers)
+                parts = [f"{option}：{count[option]}人" for option in question.get_options_list()]
+                summary_parts.append(f"「{question.content}」選項分布：{'，'.join(parts)}")
+
+            elif question.question_type == 'text':
+                examples = question_answers.values_list('content', flat=True)[:3]
+                if examples:
+                    summary_parts.append(f"「{question.content}」的部分回饋包括：{'；'.join(examples)}")
+                else:
+                    summary_parts.append(f"「{question.content}」尚無文字回饋。")
+
+        responses_summary = "\n".join(summary_parts)
+
+    # 組裝 LLM 用的 event_data
+    event_data = {
+        'name': event.name,
+        'event_time': event.event_time.strftime("%Y-%m-%d %H:%M"),
+        'location': event.location,
+        'activity_type': event.activity_type,
+        'language': event.language or "未填寫",
+        'registrations': total_registrations,
+        'attendees': total_attendees,
+        'feedbacks': total_responses
+    }
+
+    # LLM 生成報告
+    report = generate_event_report_with_gpt(event_data, responses_summary)
+
+    return render(request, 'feedback/event_report.html', {
+        'event': event,
+        'report': report
+    })

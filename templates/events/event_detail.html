@@ -1,165 +1,141 @@
 {% extends 'base.html' %}
 
 {% block content %}
-   <!--<h1>{{ event.name }}</h1>
-    
-    {% if event.poster %}
-        <img src="{{ event.poster.url }}" alt="{{ event.name }} poster" style="max-width:100%; height:auto;">
-    {% endif %}
-    
-    <p><strong>活動簡介:</strong> {{ event.description }}</p>
-    <p><strong>活動時間:</strong> {{ event.event_time }}</p>
-    <p><strong>活動結束時間:</strong> {{ event.end_time }}</p>
-    <p><strong>活動地點:</strong> {{ event.location }}</p>
-    <p><strong>名額限制:</strong> {{ event.capacity_limit }}</p>
-    <p><strong>報名開始:</strong> {{ event.registration_start }}</p>
-    <p><strong>報名結束:</strong> {{ event.registration_end }}</p>
+<style>
+  .event-detail-container {
+    max-width: 90%;
+    width: 48rem;
+    margin: 2rem auto;
+    padding: 1.5rem;
+  }
 
-    <p><strong>已報名人數:</strong> {{ participants_count }}</p>  <!-顯示報名人數 - ->
+  .event-detail-container h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
 
+  .event-detail-poster {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .event-detail-poster img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+
+  .event-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .event-detail-table th,
+  .event-detail-table td {
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .event-detail-table th {
+    width: 35%;
+    background-color: #f9f9f9;
+    font-weight: 600;
+  }
+
+  .event-buttons {
+    margin-bottom: 1.5rem;
+  }
+
+  .event-buttons form,
+  .event-buttons a {
+    display: inline-block;
+    margin: 0.25rem 0.5rem 0.5rem 0;
+  }
+
+  .event-return {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .event-detail-container h1 {
+      font-size: 1.5rem;
+    }
+
+    .event-detail-table {
+      font-size: 0.95rem;
+    }
+
+    .event-buttons a,
+    .event-buttons button {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div class="event-detail-container">
+  <h1>{{ event.name }}</h1>
+
+  {% if event.poster %}
+  <div class="event-detail-poster">
+    <img src="{{ event.poster.url }}" alt="{{ event.name }} poster">
+  </div>
+  {% endif %}
+
+  <table class="event-detail-table">
+    <tr><th>活動簡介：</th><td>{{ event.description }}</td></tr>
+    <tr><th>活動時間：</th><td>{{ event.event_time }}</td></tr>
+    <tr><th>活動結束時間：</th><td>{{ event.end_time }}</td></tr>
+    <tr><th>活動地點：</th><td>{{ event.location }}</td></tr>
+    <tr><th>名額限制：</th><td>{{ event.capacity_limit }}</td></tr>
+    <tr><th>報名開始：</th><td>{{ event.registration_start }}</td></tr>
+    <tr><th>報名結束：</th><td>{{ event.registration_end }}</td></tr>
+    <tr><th>已報名人數：</th><td>{{ participants_count }}</td></tr>
+  </table>
+
+  <!-- 報名狀態區塊 -->
+  <div class="event-buttons">
     {% if user.is_authenticated %}
-        {% if is_registered %}
-            <p>您已報名此活動。</p>
-            <form method="POST" action="{% url 'cancel_registration' event.id %}">
-                {% csrf_token %}
-                <button type="submit">取消報名</button>
-            </form>
-        {% elif participants_count >= event.capacity_limit %}
-            <p>此活動名額已滿。</p>
-        {% elif now < event.registration_start %}
-            <p>報名尚未開放。</p>
-        {% elif now > event.registration_end %}
-            <p>報名已截止。</p>
-        {% else %}
-            <form method="POST" action="{% url 'register_event' event.id %}">
-                {% csrf_token %}
-                <button type="submit">報名活動</button>
-            </form>
-        {% endif %}
+      {% if is_registered %}
+        <p class="text-success">您已報名此活動。</p>
+        <form method="POST" action="{% url 'cancel_registration' event.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger">取消報名</button>
+        </form>
+      {% elif participants_count >= event.capacity_limit %}
+        <p class="text-danger">此活動名額已滿。</p>
+      {% elif now < event.registration_start %}
+        <p class="text-muted">報名尚未開放。</p>
+      {% elif now > event.registration_end %}
+        <p class="text-muted">報名已截止。</p>
+      {% else %}
+        <form method="POST" action="{% url 'register_event' event.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary">報名活動</button>
+        </form>
+      {% endif %}
     {% else %}
-        <p>請先<a href="{% url 'login' %}">登入</a>以報名活動。</p>
+      <p>請先<a href="{% url 'login' %}">登入</a>以報名活動。</p>
     {% endif %}
+  </div>
 
-    <!- - Display Edit Event button only for administrators - ->
-    {% if user.is_staff %}
-        <a href="{% url 'edit_event' event.id %}" class="btn btn-primary">編輯活動</a>
-    {% endif %}
+  <!-- 管理員功能 -->
+  {% if user in event.managers.all or user.is_staff %}
+  <div class="event-buttons">
+    <a href="{% url 'edit_event' event.id %}" class="btn btn-secondary">編輯活動</a>
+    <a href="{% url 'export_registrations_csv' event.id %}" class="btn btn-secondary">匯出名單 (CSV)</a>
+    <a href="{% url 'import_registrations_csv' event.id %}" class="btn btn-secondary">匯入名單 (CSV)</a>
+  </div>
+  {% endif %}
 
-    <a href="{% url 'event_list' %}">返回活動列表</a> --> 
-
-
-
-
-
-
-    <!-- ✅ 新增：主容器置中顯示並設限最大寬度 -->
-<div class="container" style="max-width: 800px; margin: auto; padding: 20px;">
-
-    <!-- ✅ 修改：標題置中與下方間距 -->
-    <h1 class="text-center mb-4">{{ event.name }}</h1> <!-- 修改：置中活動標題 -->
-
-    <!-- 活動海報 -->
-    {% if event.poster %}
-        <div class="text-center mb-4"> <!-- ✅ 新增：置中圖片並加下間距 -->
-            <img src="{{ event.poster.url }}" alt="{{ event.name }} poster" style="max-width:100%; height:auto; border-radius: 8px;"> <!-- ✅ 新增：圓角修飾 -->
-        </div>
-    {% endif %}
-<!-- 活動資訊區塊 -->
-<div class="mb-4">
-
-    <!-- ✅ 表格化顯示，使用柔和邊框色 -->
-    <table style="width: 100%; border-collapse: collapse; border: 1px solid #e0e0e0;"> <!-- ✅ 淡灰外框 -->
-        <tbody>
-            <tr style="border-bottom: 1px solid #e0e0e0;"> <!-- ✅ 柔和底線 -->
-                <th style="text-align: left; padding: 12px; width: 30%; border-right: 1px solid #e0e0e0;">活動簡介：</th>
-                <td style="padding: 12px;">{{ event.description }}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #e0e0e0;">
-                <th style="text-align: left; padding: 12px; border-right: 1px solid #e0e0e0;">活動時間：</th>
-                <td style="padding: 12px;">{{ event.event_time }}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #e0e0e0;">
-                <th style="text-align: left; padding: 12px; border-right: 1px solid #e0e0e0;">活動結束時間：</th>
-                <td style="padding: 12px;">{{ event.end_time }}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #e0e0e0;">
-                <th style="text-align: left; padding: 12px; border-right: 1px solid #e0e0e0;">活動地點：</th>
-                <td style="padding: 12px;">{{ event.location }}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #e0e0e0;">
-                <th style="text-align: left; padding: 12px; border-right: 1px solid #e0e0e0;">名額限制：</th>
-                <td style="padding: 12px;">{{ event.capacity_limit }}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #e0e0e0;">
-                <th style="text-align: left; padding: 12px; border-right: 1px solid #e0e0e0;">報名開始：</th>
-                <td style="padding: 12px;">{{ event.registration_start }}</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #e0e0e0;">
-                <th style="text-align: left; padding: 12px; border-right: 1px solid #e0e0e0;">報名結束：</th>
-                <td style="padding: 12px;">{{ event.registration_end }}</td>
-            </tr>
-            <tr>
-                <th style="text-align: left; padding: 12px; border-right: 1px solid #e0e0e0;">已報名人數：</th>
-                <td style="padding: 12px;">{{ participants_count }}</td>
-            </tr>
-        </tbody>
-    </table>
-    <!-- ✅ 柔和表格結束 -->
-
+  <!-- 返回按鈕 -->
+  <div class="event-return">
+    <a href="{% url 'event_list' %}" class="btn btn-link">← 返回活動列表</a>
+  </div>
 </div>
-
-
-
-
-
-
-
-    <!-- 報名狀態 -->
-    <div class="mb-4">
-        {% if user.is_authenticated %}
-            {% if is_registered %}
-                <p class="text-success">您已報名此活動。</p> <!-- ✅ 新增：綠色提示 -->
-                <form method="POST" action="{% url 'cancel_registration' event.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger">取消報名</button> <!-- ✅ 新增：按鈕樣式 -->
-                </form>
-            {% elif participants_count >= event.capacity_limit %}
-                <p class="text-danger">此活動名額已滿。</p>
-            {% elif now < event.registration_start %}
-                <p class="text-muted">報名尚未開放。</p>
-            {% elif now > event.registration_end %}
-                <p class="text-muted">報名已截止。</p>
-            {% else %}
-                <form method="POST" action="{% url 'register_event' event.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">報名活動</button> <!-- ✅ 新增：報名按鈕樣式 -->
-                </form>
-            {% endif %}
-        {% else %}
-            <p>請先<a href="{% url 'login' %}">登入</a>以報名活動。</p>
-        {% endif %}
-    </div>
-
-    <!-- 管理員功能 -->
-    {% if user in event.managers.all or user.is_staff %}
-        <div class="mb-3">
-            <a href="{% url 'edit_event' event.id %}" class="btn btn-secondary">編輯活動</a> <!-- ✅ 修改：加入 btn-secondary 樣式 -->
-            <a href="{% url 'export_registrations_csv' event.id %}" class="btn btn-secondary">匯出活動名單 CSV</a> <!-- ✅ 修改：加入 btn-secondary 樣式 -->
-            <a href="{% url 'import_registrations_csv' event.id %}" class="btn btn-secondary">匯入報名名單(CSV)</a> <!-- ✅ 修改：加入 btn-secondary 樣式 -->
-        </div>
-    {% endif %}
-
-    <!-- 返回活動列表 -->
-    <div>
-        <a href="{% url 'event_list' %}" class="btn btn-link">← 返回活動列表</a> <!-- ✅ 修改：讓返回更像按鈕 -->
-    </div>
-
-</div>
-
-
-
-
-
-
-
 {% endblock %}

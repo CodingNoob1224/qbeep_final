@@ -1,52 +1,40 @@
 {% extends "base.html" %}
+
 {% block content %}
-<!-- <h2>我的報名活動</h2>
-<ul>
-  {% for reg in registrations %}
-    <li>
-      {{ reg.event.name }}
-      - <a href="{% url 'fill_form' reg.event.id %}">填寫問卷</a>
-    </li>
-  {% empty %}
-    <li>目前沒有符合資格的活動</li>
-  {% endfor %}
-</ul> -->
-
-
-
-
-<!-- 新增：美化區塊樣式 -->
 <style>
   .activity-section {
-    background-color: rgba(255, 255, 255, 0.85); /* 半透明白底，背景固定仍可見 */
-    padding: 30px;
-    margin: 40px auto;
-    border-radius: 20px;
-    max-width: 700px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 2rem;
+    margin: 3rem auto;
+    border-radius: 1.25rem;
+    max-width: 90%;
+    width: 44rem;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
   }
 
   .activity-section h2 {
     text-align: center;
     font-weight: bold;
     color: #333;
-    margin-bottom: 25px;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .activity-section ul {
-    list-style: none; /* 移除原本的圓點 */
+    list-style: none;
     padding: 0;
   }
 
   .activity-section li {
     background-color: #f9f9f9;
-    margin: 10px 0;
-    padding: 15px 20px;
-    border-radius: 10px;
+    margin: 0.75rem 0;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: background-color 0.3s;
+    flex-wrap: wrap;
   }
 
   .activity-section li:hover {
@@ -57,23 +45,41 @@
     text-decoration: none;
     color: #0d6efd;
     font-weight: 500;
+    margin-top: 0.5rem;
   }
 
   .activity-section a:hover {
     text-decoration: underline;
   }
+
+  @media (max-width: 480px) {
+    .activity-section {
+      padding: 1.25rem;
+    }
+
+    .activity-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .activity-section li {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .activity-section a {
+      font-size: 0.95rem;
+    }
+  }
 </style>
 
-<!-- 修改：將區塊加上 class 美化 -->
 <div class="activity-section">
   <h2>我的報名活動</h2>
   <ul>
     {% for reg in registrations %}
       <li>
-        {{ reg.event.name }}
-        <!-- 修改：更現代的問卷連結樣式 -->
+        <span>{{ reg.event.name }}</span>
         <a href="{% url 'fill_form' reg.event.id %}">
-          填寫問卷 <i class="bi bi-pencil-square"></i> <!-- Bootstrap Icon -->
+          填寫問卷 <i class="bi bi-pencil-square"></i>
         </a>
       </li>
     {% empty %}
@@ -81,8 +87,4 @@
     {% endfor %}
   </ul>
 </div>
-
-
-
-
 {% endblock %}

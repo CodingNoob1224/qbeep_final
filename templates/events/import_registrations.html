@@ -1,21 +1,68 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>匯入報名名單：{{ event.name }}</h2>
+<style>
+  .import-container {
+    max-width: 90%;
+    width: 40rem;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.05);
+  }
 
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <div class="mb-3">
-    <label for="csv_file" class="form-label">上傳 CSV 檔案（欄位名稱為「帳號」）</label>
-    <input type="file" name="csv_file" accept=".csv" required class="form-control">
-  </div>
-  <button type="submit" class="btn btn-primary">匯入報名</button>
-</form>
+  .import-container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+  }
 
-<hr>
-<h4>匯入結果</h4>
-<ul>
-  {% for m in messages %}
-    <li>{{ m }}</li>
-  {% endfor %}
-</ul>
+  .import-container h4 {
+    margin-top: 2rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .import-container ul {
+    padding-left: 1.25rem;
+  }
+
+  @media (max-width: 480px) {
+    .import-container {
+      padding: 1.25rem;
+    }
+
+    .import-container h2 {
+      font-size: 1.5rem;
+    }
+
+    .import-container h4 {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+<div class="import-container">
+  <h2>匯入報名名單：{{ event.name }}</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="csv_file" class="form-label">上傳 CSV 檔案（欄位名稱為「帳號」）</label>
+      <input type="file" name="csv_file" accept=".csv" required class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary w-100">匯入報名</button>
+  </form>
+
+  {% if messages %}
+    <hr>
+    <h4>匯入結果</h4>
+    <ul>
+      {% for m in messages %}
+        <li>{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
 {% endblock %}

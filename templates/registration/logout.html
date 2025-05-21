@@ -1,15 +1,57 @@
-<!-- templates/registration/logout.html -->
-{% extends 'base.html' %}  <!-- 繼承基礎模板 -->
+{% extends 'base.html' %}
 
-{% block title %}登出成功{% endblock %}  <!-- 設定標題 -->
+{% block title %}登出成功{% endblock %}
 
-{% block content %}  <!-- 定義內容區塊 -->
-    <h1>登出成功</h1>
-    <p>您已成功登出！</p>
-    <p>將在幾秒鐘後自動重定向到登入頁面。</p>
-    <script>
-        setTimeout(function() {
-            window.location.href = "{% url 'login' %}";  // 重定向到登入頁面
-        }, 3000);  // 3秒後重定向
-    </script>
+{% block content %}
+<style>
+  .logout-container {
+    max-width: 90%;
+    width: 32rem;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+
+  .logout-container h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #28a745;
+  }
+
+  .logout-container p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .logout-container {
+      padding: 1.25rem;
+    }
+
+    .logout-container h1 {
+      font-size: 1.5rem;
+    }
+
+    .logout-container p {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="logout-container">
+  <h1>登出成功</h1>
+  <p>您已成功登出！</p>
+  <p>將在幾秒鐘後自動重定向到登入頁面。</p>
+</div>
+
+<script>
+  setTimeout(function () {
+    window.location.href = "{% url 'login' %}";
+  }, 3000);
+</script>
 {% endblock %}

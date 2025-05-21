@@ -1,0 +1,7 @@
+<!-- templates/event/event_report.html -->
+{% extends 'base.html' %}
+{% block content %}
+  <h2>活動結案報告：{{ event.name }}</h2>
+  <pre style="white-space: pre-wrap;">{{ report }}</pre>
+  <a href="{% url 'event_list' %}">← 回到活動列表</a>
+{% endblock %}

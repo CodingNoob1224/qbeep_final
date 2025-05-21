@@ -1,77 +1,100 @@
-<!-- templates/index.html -->
 {% extends 'base.html' %}
 
 {% block title %}首頁{% endblock %}
 
 {% block content %}
-    <!-- <h1>歡迎來到我們的網站！</h1>
-    <p>pythonanywhere test</p>
-    <p>這裡是活動管理系統，你可以在這裡查看和參加各種活動。</p>
-
-    {% if user.is_authenticated %}
-        <p>你好，{{ user.username }}！</p>
-        <a href="{% url 'event_list' %}" class="btn btn-primary">查看活動列表</a>
-    {% else %}
-        <p>請先登入或註冊以查看活動。</p>
-        <a href="{% url 'login' %}" class="btn btn-secondary">登入</a>
-        <a href="{% url 'register' %}" class="btn btn-secondary">註冊</a>
-    {% endif %}-->
-
-
-
-
-<!-- 修改：主標題置中與字體美化 -->
-<h1 style="text-align: center; font-size: 2.5em; font-weight: bold; margin-top: 40px; color: #2c3e50;">
-    歡迎來到我們的網站！
-</h1>
-
-<!-- 修改：簡介文字美化 -->
-
-<p style="text-align: center; font-size: 1.1em; color: #555; margin-bottom: 30px;">
-    這裡是活動管理系統，你可以在這裡查看和報名各種活動。
-</p>
-
-<!-- 不可更改：條件式保留，僅內部加樣式與按鈕格式化 -->
-{% if user.is_authenticated %}
-    <!-- 修改：歡迎詞置中與字體美化 -->
-    <p style="text-align: center; font-size: 1.1em; color: #333;">
-        你好，{{ user.username }}！
-    </p>
-
-    <!-- 修改：按鈕樣式與置中 -->
-    <div style="text-align: center; margin-top: 20px;">
-        <a href="{% url 'event_list' %}" 
-           style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s;"> <!-- 新增：美化按鈕 -->
-           查看活動列表
-        </a>
-    </div>
-{% else %}
-    <!-- 修改：提示文字美化 -->
-    <p style="text-align: center; font-size: 1.1em; color: #333;">
-        請先登入或註冊以查看活動。
-    </p>
-
-    <!-- 修改：登入與註冊按鈕樣式與排版 -->
-    <div style="text-align: center; margin-top: 20px;">
-        <a href="{% url 'login' %}" 
-           style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 6px; margin-right: 10px; font-weight: 500; transition: background-color 0.3s;"> <!-- 新增 -->
-           登入
-        </a>
-        <a href="{% url 'register' %}" 
-           style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s;"> <!-- 新增 -->
-           註冊
-        </a>
-    </div>
-{% endif %}
-
-<!-- 新增：按鈕 hover 效果 -->
 <style>
-    a:hover {
-        opacity: 0.9;
+  .index-container {
+    max-width: 800px;
+    margin: 60px auto 40px auto;
+    padding: 0 1rem;
+    text-align: center;
+  }
+
+  .index-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+
+  .index-description {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 30px;
+  }
+
+  .index-username {
+    font-size: 1.1rem;
+    color: #333;
+  }
+
+  .index-button-group {
+    margin-top: 25px;
+  }
+
+  .index-button-group a {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 0 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary-blue {
+    background-color: #007BFF;
+  }
+
+  .btn-primary-blue:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-gray {
+    background-color: #6c757d;
+  }
+
+  .btn-gray:hover {
+    background-color: #5a6268;
+  }
+
+  @media (max-width: 480px) {
+    .index-title {
+      font-size: 2rem;
     }
+
+    .index-description,
+    .index-username {
+      font-size: 1rem;
+    }
+
+    .index-button-group a {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+    }
+  }
 </style>
 
+<div class="index-container">
+  <h1 class="index-title">歡迎來到我們的網站！</h1>
+  <p class="index-description">
+    這裡是活動管理系統，你可以在這裡查看和報名各種活動。
+  </p>
 
-
-
+  {% if user.is_authenticated %}
+    <p class="index-username">你好，{{ user.username }}！</p>
+    <div class="index-button-group">
+      <a href="{% url 'event_list' %}" class="btn-primary-blue">查看活動列表</a>
+    </div>
+  {% else %}
+    <p class="index-username">請先登入或註冊以查看活動。</p>
+    <div class="index-button-group">
+      <a href="{% url 'login' %}" class="btn-gray">登入</a>
+      <a href="{% url 'register' %}" class="btn-gray">註冊</a>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

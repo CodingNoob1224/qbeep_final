@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 from .views import check_detail
 from .views import draw_home, draw_winners
+from .views import generate_report_view
 
 
 urlpatterns = [
@@ -14,5 +15,7 @@ urlpatterns = [
     path('forms/<int:event_id>/fill/', views.fill_form, name='fill_form'),
     path('forms/<int:event_id>/analysis/', views.form_analysis, name='form_analysis'),
     path('draw/<int:event_id>/', views.draw_winners, name='draw_winners'),
+    path('event/<int:event_id>/report/', generate_report_view, name='generate_event_report'),
+
 
 ]

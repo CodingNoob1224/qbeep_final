@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+
+GPT_API_KEY="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"
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-bnpk&8ac@96l5yi@-7(@nsv^iu_*$f+gxrco9_qdhlhk(2y6ns'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['qbeep.zeabur.app']
+ALLOWED_HOSTS = ['qbeep.zeabur.app','localhost']
 
 
 # Application definition

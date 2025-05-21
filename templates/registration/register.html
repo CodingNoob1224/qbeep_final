@@ -1,72 +1,109 @@
-<!-- templates/member/register.html -->
 {% extends 'base.html' %}
-<!-- 繼承基礎模板 -->
 
 {% block title %}註冊{% endblock %}
-<!-- 設定標題 -->
 
 {% block content %}
-<!-- 定義內容區塊 -->
-<!--<h2>註冊</h2>
-<form method="post">
-  {% csrf_token %} {{ form.as_p }}
-  <button type="submit">註冊</button>
-</form>
-<p>已經有帳號？<a href="{% url 'login' %}">登入</a></p>-->
-
-
-
-<!-- 修改：置中標題 -->
-<h2 style="font-size: 1.8em; font-weight: bold; margin-bottom: 20px; color: #333; text-align: center;">
-  註冊
-</h2>
-
-<!-- 修改：美化表單框架 -->
-<form method="post" style="max-width: 400px; margin: 0 auto; background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-{% csrf_token %}
-
-<!-- 建議手動渲染每個欄位，這裡暫保留 as_p 也可配合 CSS 微調 -->
-<div style="display: flex; flex-direction: column; gap: 15px;">
-  {{ form.as_p }}
-</div>
-
-<!-- 修改：藍色註冊按鈕 -->
-<button type="submit" style="margin-top: 20px; width: 100%; padding: 10px 0; background-color: #007BFF; color: white; border: none; border-radius: 8px; font-size: 1em; cursor: pointer; transition: background-color 0.3s;">
-  註冊
-</button>
-</form>
-
-<!-- 修改：置中＋美化登入提示 -->
-<p style="text-align: center; margin-top: 15px; font-size: 0.95em;">
-已經有帳號？
-<a href="{% url 'login' %}" style="color: #007BFF; text-decoration: none;">登入</a>
-</p>
-
-<!-- 新增：輸入框樣式 -->
 <style>
-input, select, textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1em;
-  box-sizing: border-box;
-}
+  .register-container {
+    max-width: 90%;
+    width: 28rem;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
+  }
 
-input:focus, select:focus, textarea:focus {
-  border-color: #007BFF;
-  outline: none;
-  box-shadow: 0 0 4px rgba(0,123,255,0.3);
-}
+  .register-container h2 {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
 
-/* 新增：按鈕 hover 效果 */
-button:hover {
-  background-color: #0056b3;
-}
+  .register-container form p {
+    margin-bottom: 1rem;
+  }
+
+  .register-container input,
+  .register-container select,
+  .register-container textarea {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  .register-container input:focus,
+  .register-container select:focus,
+  .register-container textarea:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0,123,255,0.3);
+  }
+
+  .register-container button {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .register-container button:hover {
+    background-color: #0056b3;
+  }
+
+  .register-container .login-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .register-container .login-link a {
+    color: #007BFF;
+    text-decoration: none;
+  }
+
+  .register-container .login-link a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 480px) {
+    .register-container {
+      padding: 1.25rem;
+    }
+
+    .register-container h2 {
+      font-size: 1.5rem;
+    }
+
+    .register-container button {
+      font-size: 0.95rem;
+    }
+  }
 </style>
 
+<div class="register-container">
+  <h2>註冊</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">註冊</button>
+  </form>
 
-
-
-
+  <div class="login-link">
+    已經有帳號？
+    <a href="{% url 'login' %}">登入</a>
+  </div>
+</div>
 {% endblock %}

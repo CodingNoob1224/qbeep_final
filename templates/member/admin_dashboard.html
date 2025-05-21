@@ -3,89 +3,78 @@
 {% block title %}管理平台{% endblock %}
 
 {% block content %}
-<!-- <div class="container mt-4">
-    <h1>管理平台</h1>
-    <p class="text-muted">歡迎管理員！請選擇您要執行的功能。</p>
-
-    <div class="list-group mt-4">
-        <a href="{% url 'create_event' %}" class="list-group-item list-group-item-action">
-            ➕ 新增活動
-        </a>
-        <a href="{% url 'event_list' %}" class="list-group-item list-group-item-action">
-            📋 活動列表
-        </a>
-        <a href="{% url 'event_analysis' %}" class="list-group-item list-group-item-action">
-            📈 活動分析
-        </a>
-        <a href="{% url 'draw_home' %}" class="list-group-item list-group-item-action">
-            🎯 抽獎功能
-        </a>
-    </div>
-</div> -->
-
-
-
-
-
-<!-- 新增：美化區塊樣式 -->
 <style>
+  .admin-panel-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.625rem 1.5rem rgba(0, 0, 0, 0.08);
+    max-width: 90%;
+    width: 44rem;
+    margin: 3rem auto;
+  }
+
+  .admin-panel-container h1 {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    color: #333;
+  }
+
+  .admin-panel-container p {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .list-group a {
+    font-size: 1.1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.625rem;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .list-group a:hover {
+    background-color: #f0f8ff;
+    transform: scale(1.02);
+  }
+
+  @media (max-width: 480px) {
     .admin-panel-container {
-        background-color: rgba(255, 255, 255, 0.9); /* 新增：白色半透明背景，突顯內容 */
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* 新增：柔和陰影 */
-        max-width: 700px;
-        margin: 60px auto; /* 新增：置中顯示 */
+      padding: 1.25rem;
     }
 
     .admin-panel-container h1 {
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    .admin-panel-container p {
-        text-align: center;
-        font-size: 1.1rem;
+      font-size: 1.5rem;
     }
 
     .list-group a {
-        font-size: 1.1rem; /* 新增：放大文字更清晰 */
-        padding: 15px 20px;
-        border-radius: 10px; /* 新增：圓角列表 */
-        margin-bottom: 15px;
-        transition: background-color 0.3s ease, transform 0.2s ease;
+      font-size: 1rem;
+      padding: 0.875rem 1rem;
     }
-
-    .list-group a:hover {
-        background-color: #f0f8ff; /* 新增：hover 效果 */
-        transform: scale(1.02);
-    }
+  }
 </style>
 
-<!-- 修改：加入外層容器 class 以套用樣式 -->
-<div class="container mt-4 admin-panel-container">
-    <h1>管理平台</h1>
-    <p class="text-muted">歡迎管理員！請選擇您要執行的功能。</p>
+<div class="admin-panel-container">
+  <h1>管理平台</h1>
+  <p class="text-muted">歡迎管理員！請選擇您要執行的功能。</p>
 
-    <div class="list-group mt-4">
-        <a href="{% url 'create_event' %}" class="list-group-item list-group-item-action">
-            ➕ 新增活動
-        </a>
-        
-        <a href="{% url 'event_list' %}" class="list-group-item list-group-item-action">
-            📋 活動列表
-        </a>
-        <a href="{% url 'event_analysis' %}" class="list-group-item list-group-item-action">
-            📈 活動分析
-        </a>
-        <a href="{% url 'draw_home' %}" class="list-group-item list-group-item-action">
-            🎯 抽獎功能
-        </a>
-    </div>
+  <div class="list-group mt-4">
+    <a href="{% url 'create_event' %}" class="list-group-item list-group-item-action">
+      ➕ 新增活動
+    </a>
+    <a href="{% url 'event_list' %}" class="list-group-item list-group-item-action">
+      📋 活動列表
+    </a>
+    <a href="{% url 'event_analysis' %}" class="list-group-item list-group-item-action">
+      📈 活動分析
+    </a>
+    <a href="{% url 'draw_home' %}" class="list-group-item list-group-item-action">
+      🎯 抽獎功能
+    </a>
+  </div>
 </div>
-
-
-
 {% endblock %}
