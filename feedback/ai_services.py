@@ -1,8 +1,12 @@
 import openai
 from django.conf import settings
 
+
+import os
+
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY")) 
 # 新 SDK 初始化 client
-client = openai.OpenAI(api_key=settings.GPT_API_KEY)
+# client = openai.OpenAI(api_key=settings.GPT_API_KEY)
 
 def generate_event_report_with_gpt(event_data, responses_summary):
     prompt = f"""
