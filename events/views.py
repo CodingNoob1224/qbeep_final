@@ -432,4 +432,3 @@ def import_registrations_csv(request, event_id):
         'event': event,
         'messages': messages
     })
-    from django.shortcuts import render, get_object_or_404
