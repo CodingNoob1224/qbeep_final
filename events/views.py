@@ -397,6 +397,9 @@ from .models import Event, Registration
 from .utils import parse_usernames_from_csv  # 請確認有 utils.py
 from events.decorators import has_event_permission
 
+from django.shortcuts import render, redirect, get_object_or_404
+
+
 @has_event_permission
 def import_registrations_csv(request, event_id):
     event = get_object_or_404(Event, id=event_id)
